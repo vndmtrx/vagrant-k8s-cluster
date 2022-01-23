@@ -32,7 +32,7 @@ vagrant ssh control-node -c "kubectl proxy"
 
 ```
 
-## You can access the dashboard on the URL: http://localhost:9001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+You can access the dashboard on the URL: http://localhost:9001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 
 ```
 vagrant destroy -f
