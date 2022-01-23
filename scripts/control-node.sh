@@ -7,7 +7,7 @@ HOST=`hostname -s`.cluster
 
 echo "$IP $HOST" | sudo tee -a /etc/hosts | sudo tee /tmp/k8s/hosts-entry
 
-sudo kubeadm init --control-plane-endpoint="$HOST:6443" --apiserver-advertise-address=$IP --apiserver-cert-extra-sans=$IP --pod-network-cidr=172.16.0.0/16 --service-cidr=172.16.0.0/16 --node-name=$HOST
+sudo kubeadm init --control-plane-endpoint="$HOST:6443" --apiserver-advertise-address=$IP --apiserver-cert-extra-sans=$IP --pod-network-cidr=172.16.0.0/16 --service-cidr=172.17.0.0/16 --node-name=$HOST
 
 echo $(id -u):$(id -g)
 mkdir -p $HOME/.kube
@@ -21,7 +21,7 @@ kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 #Qdo fizer para Flannel, atentar a isso aqui: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/troubleshooting-kubeadm/#default-nic-when-using-flannel-as-the-pod-network-in-vagrant
 
 kubeadm token create --print-join-command | tee /tmp/k8s/control-node-join.sh
-sudo cp -fi /etc/kubernetes/admin.conf /tmp/k8s/cluster-admin.conf
+sudo cp -f /etc/kubernetes/admin.conf /tmp/k8s/cluster-admin.conf
 
 curl -fsSLo kubernetes-metrics.yaml https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.4.4/components.yaml
 sed -i 's/secure-port=4443/&\n        - --kubelet-insecure-tls/' kubernetes-metrics.yaml

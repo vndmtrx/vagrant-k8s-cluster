@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "control-node" do |cn|
     cn.vm.box = IMAGE_NAME
     cn.vm.hostname = "control-node"
-    cn.vm.network "forwarded_port", guest: 8001, host: 9001, auto_correct: true
+    cn.vm.network "forwarded_port", guest: 8001, host: 8001, auto_correct: true
     cn.vm.provider "virtualbox" do |v|
       v.memory = 3072
       v.cpus = 3
@@ -27,7 +27,7 @@ Vagrant.configure("2") do |config|
     end
 
     cn.vm.provision "shell", path: "scripts/control-node.sh", privileged: false
-    #cn.vm.provision "shell", path: "scripts/dashboard.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/dashboard.sh", privileged: false
   end
 
   (1..N).each do |i|
