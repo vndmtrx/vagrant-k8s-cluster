@@ -16,7 +16,7 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] 
 sudo apt update -y
 sudo apt install docker-ce docker-ce-cli containerd.io -y
 
-cat <<EOF | sudo tee /etc/docker/daemon.json
+cat <<EOF | sudo tee /etc/docker/daemon.json  > /dev/null
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
   "log-driver": "json-file",
