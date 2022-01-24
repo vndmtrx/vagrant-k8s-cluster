@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
+echo "##################################################################"
+echo "############### Instalação do plugin de dashboard ################"
+echo "##################################################################"
+
 cat <<EOF | sudo tee /etc/sysctl.d/99-local-routing.conf > /dev/null
 net.ipv4.conf.enp0s3.route_localnet=1
 EOF
 
+# Reinicialização do serviço sysctl pois o comando `sysctl -p` dá erro quando roda, por conflito com o daemon do Systemd
+sudo systemctl daemon-reload
 sudo systemctl restart systemd-sysctl
 
 sudo iptables -t nat -I PREROUTING -p tcp -d 169.254.0.15/32 --dport 8001 -j DNAT --to-destination 127.0.0.1:8001
@@ -36,3 +42,6 @@ subjects:
 EOF
 
 kubectl apply -f admin-role-binding.yml
+
+#kubectl -n kube-system get secret --template='{{.data.token}}' $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | base64 --decode ; echo
+#kubectl proxy

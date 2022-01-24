@@ -1,6 +1,12 @@
 # Vagrant K8s Cluster
 
-This is the first of a series of repositories about deploying devops solutions for study, on the local machine.
+Instalar um cluster Kubernetes não é mais tão difícil quanto era antes do surgimento de ferramentas como Minikube, k3s e kubeadm, no entanto ainda existem várias pequenas coisas que precisam ser feitas em uma instalação do cluster, que só vamos descobrindo durante o processo de instalação e depuração dos erros que vão aparecendo.
+
+## Instalação das dependências
+
+### Docker e/ou Containerd
+
+Primeiramente, para a montagem deste tutorial foi feita a instalação do cluster com o Docker, seguindo as configurações de instalação da [Documentação do Docker](https://docs.docker.com/engine/install/) e resumidas no script de instalação `scripts/base-containerd.sh`
 
 # Getting started
 

@@ -4,6 +4,8 @@
 
 IMAGE_NAME = "ubuntu/impish64"
 N = 2
+OCI = "Containerd"
+CNI = "Calico"
 
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
@@ -26,8 +28,18 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--natnet1", "169.254.0.0/16"]
     end
 
-    cn.vm.provision "shell", path: "scripts/control-node.sh", privileged: false
-    cn.vm.provision "shell", path: "scripts/dashboard.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/30-control-node.sh", privileged: false
+
+    case CNI
+    when "Flannel"
+      cn.vm.provision "shell", path: "scripts/31-cni-flannel.sh", privileged: false
+    else #Calico
+      cn.vm.provision "shell", path: "scripts/31-cni-calico.sh", privileged: false
+    end
+
+    cn.vm.provision "shell", path: "scripts/32-cluster-join.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/33-metrics.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/34-dashboard.sh", privileged: false
   end
 
   (1..N).each do |i|
@@ -40,10 +52,16 @@ Vagrant.configure("2") do |config|
         v.customize ["modifyvm", :id, "--natnet1", "169.254.0.0/16"]
       end
 
-      w.vm.provision "shell", path: "scripts/worker-node.sh"
+      w.vm.provision "shell", path: "scripts/40-worker-node.sh"
     end
   end
 
-  #config.vm.provision "shell", path: "scripts/base-containerd.sh"
-  config.vm.provision "shell", path: "scripts/base-containerd.sh"
+  case OCI
+  when "Containerd"
+    config.vm.provision "shell", path: "scripts/10-oci-containerd.sh"
+  else #Docker
+    config.vm.provision "shell", path: "scripts/10-oci-docker.sh"
+  end
+
+  config.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
 end
