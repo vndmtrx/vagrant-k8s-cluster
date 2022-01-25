@@ -4,7 +4,6 @@ echo "##############################################################"
 echo "#################### Instalação do Docker ####################"
 echo "##############################################################"
 
-
 # Configuração para mitigar erro que aparece durante o processo do terminal do Vagrant
 export DEBIAN_FRONTEND=noninteractive
 

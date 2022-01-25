@@ -4,6 +4,7 @@ echo "##################################################################"
 echo "#################### Instalação do Containerd ####################"
 echo "##################################################################"
 
+# Configuração para mitigar erro que aparece durante o processo do terminal do Vagrant
 export DEBIAN_FRONTEND=noninteractive
 
 # Aqui é onde as coisas começam a ficar um pouco nebulosas. Apesar de os desenvolvedores do Kubernetes falarem que as coisas funcionam sem nenhum ajuste maior, isso só acontece quando você usa do Docker como backend de conteineres. O Docker faz um monte de coisas pra por trás dos panos, que quando você migra para o Containerd você precisa fazer essas configurações de forma manual.
