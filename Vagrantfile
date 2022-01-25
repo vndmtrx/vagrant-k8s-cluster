@@ -18,8 +18,21 @@ Vagrant.configure("2") do |config|
     config.vbguest.auto_update = false
   end
 
+  # Configuração da pasta de montagem dos arquivos gerados pelo control node
   config.vm.synced_folder "./data", "/tmp/k8s", create: true
 
+  # Seletor do script de instalação da engine de contêiner
+  case OCI
+  when "Containerd"
+    config.vm.provision "shell", path: "scripts/10-oci-containerd.sh"
+  else #Docker
+    config.vm.provision "shell", path: "scripts/10-oci-docker.sh"
+  end
+
+  # Script de instalação das ferramentas básicas do Kubernetes
+  config.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
+
+  # Configurações de instalação específicas do control node
   config.vm.define "control-node" do |cn|
     cn.vm.box = IMAGEM
     cn.vm.hostname = "control-node"
@@ -44,6 +57,7 @@ Vagrant.configure("2") do |config|
     cn.vm.provision "shell", path: "scripts/34-dashboard.sh", privileged: false
   end
 
+  # Configurações específicas dos worker nodes
   (1..WORKERS).each do |i|
     config.vm.define "worker-#{i}" do |w|
       w.vm.box = IMAGEM
@@ -57,13 +71,4 @@ Vagrant.configure("2") do |config|
       w.vm.provision "shell", path: "scripts/40-worker-node.sh", privileged: false
     end
   end
-
-  case OCI
-  when "Containerd"
-    config.vm.provision "shell", path: "scripts/10-oci-containerd.sh"
-  else #Docker
-    config.vm.provision "shell", path: "scripts/10-oci-docker.sh"
-  end
-
-  config.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
 end
