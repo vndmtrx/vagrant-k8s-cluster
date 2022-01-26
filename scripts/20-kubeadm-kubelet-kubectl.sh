@@ -8,19 +8,19 @@ echo "#########################################################################"
 export DEBIAN_FRONTEND=noninteractive
 
 # Desativação do swap conforme orientação do kubeadm (https://github.com/kubernetes/kubeadm/issues/610)
-sudo swapoff -a
-sudo sed -i '/swap/s/^/#/' /etc/fstab
+swapoff -a
+sed -i '/swap/s/^/#/' /etc/fstab
 
 # Desativação do firewall do Ubuntu, para tratar de problemas ainda não verificados no cluster
-sudo ufw disable
+ufw disable
 
 # Instalação das dependências (certificado, repositório)
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list > /dev/null
+curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list > /dev/null
 
 # Instalação do Kubeadm, Kubelet e Kubectl
-sudo apt update -y
-sudo apt install kubelet kubeadm kubectl -y
+apt-get update -yq
+apt-get install kubelet kubeadm kubectl -yq
 
 # Travamento da versão do Kubeadm, Kubelet e Kubectl
-sudo apt-mark hold kubelet kubeadm kubectl
+apt-mark hold kubelet kubeadm kubectl
