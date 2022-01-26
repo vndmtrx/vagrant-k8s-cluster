@@ -29,54 +29,83 @@ Uma coisa para qual esse repositório foi pensado foi a de ser possível customi
 
 - Na imagem do Ubuntu 21.10 (usada neste repositório) a interface de rede criada vêm com o nome `enp0s8` (linha [7](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-node.sh#L7)). Se a imagem for alterada, é importante atentar para este detalhe, pois a nomenclatura da interface pode mudar entre distribuições. No entanto, devido à forma como o VirtualBox cria as interfaces, a interface pública é sempre a segunda placa de rede, sendo a primeira do NAT usado pelo Vagrant.
 
-Em tempo, esse deploy não foi testado em um ambiente Windows, somente em um ambiente Linux (Linux Mint 20.2 Uma). Caso vocês tenham algum problema com a execução deste repositório em outros ambientes, sintam-se à vontade de enviar contribuições e/ou até PRs com correções ou adições ao script.
-
 ### Docker e/ou Containerd
 
 Primeiramente, para a montagem deste tutorial foi feita a instalação do cluster com o Docker, seguindo as configurações de instalação da [Documentação do Docker](https://docs.docker.com/engine/install/) e resumidas no script de instalação `scripts/10-oci-docker.sh` e posteriormente foi adicionada a possibilidade de usar o Containerd como engine OCI, que está disponível no script `scripts/10-oci-containerd.sh`. A opção sobre qual engine OCI usar pode ser configurada na variável OCI dentro do arquivo `Vagrantfile`.
 
+Para a instalação do Docker, não foi feita nenhuma alteração na forma como é feita a instalação, sendo o mesmo do tutorial apresentado na documentação [Container Runtimes](https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker).
 
+Para a instalação do Containerd, são necessárias algumas etapas já que o Docker faz muita coisa "magicamente" por nós. Aqui é onde as coisas começam a ficar um pouco nebulosas. Apesar de os desenvolvedores do Kubernetes falarem que as coisas funcionam sem nenhum ajuste maior, isso só acontece quando você usa do Docker como backend de conteineres. O Docker faz um monte de coisas pra por trás dos panos, que quando você migra para o Containerd você precisa fazer essas configurações de forma manual. As instruções de instalação do Containerd estão detalhadas nos comentários do arquivo `scripts/10-oci-containerd.sh`.
 
-# Getting started
+### Calico e/ou Flannel
 
-```
+Para a configuração do plugin de rede que o Kubernetes irá usar, primeiramente usamos o Calico, pela simplicidade de configuração, já que na versão atual ele importa as configurações de pods e serviços direto do Kubernetes, não sendo necessário nenhum ajuste na configuração. No entanto, caso seja necessário usar uma configuração personalizada (especificamente de rede), eu deixei comentado alterações no arquivo `calico.yaml` que é baixado para a implantação da rede. As alterações são no pool de IPs que o Calico pode usar. Como disse, o Calico atualmente é inteligente o suficiente para encontrar essas informações, considerando que elas tenham sido passadas para o comando `kubeadm init` pelos parâmetros `--service-cidr` e `--pod-network-cidr`.
+
+Ainda não foi feita a configuração do plugin de redes usando o Flannel, mas já deixei o arquivo ali disponível para estudo futuro do deploy automatizado do mesmo.
+
+Em breve pretendo colocar a instalação do plugin de redes usando o Cillium, para tirar proveito das facilidades do eBPF em relação ao iptables.
+
+### Plugins instalados
+
+#### Metrics
+
+No plugin de métricas, somente uma alteração foi feita no manifest, para que não fosse necessário o uso de um certificado TLS de autoridade certificadora, permitindo o uso do certificado gerado pelo `kubeadm init`, através da inserção da opção `--kubelet-insecure-tls`.
+
+Já o plugin de dashboard, entregue pelo comando `kubectl proxy` só permite o acesso à URL através do endereço localhost da máquina guest, desta forma inviabilizando o seu acesso pelo usuário. Desta forma, foi feita uma configuração de rota no iptables para que os acessos que chegassem através do port forward do vagrant (e que são entregues pela rede NAT) fossem redirecionados via regra DNAT para o localhost, assim permitindo o acesso do dashboard neste nosso exemplo. Esta não é a forma correta de se fazer, mas para questões de estudo, esta forma é a que menos impacta em alteração das configurações de instalação do plugin.
+
+Ainda sobre o dashboard, ao acessar o mesmo usando o arquivo `cluster-admin.conf` gerado pelo comando `kubeadm init`, o dashboard nos retornava um erro de *Not enough data to create auth info structure*. Este problema é bem explicado neste [issue](https://github.com/kubernetes/dashboard/issues/2474) no repo do kubernetes. Para resolver esse problema, nós criamos uma conta admin usando `ServiceAccount` e em seguida aplicamos uma `ClusterRoleBinding` no usuário. Com isso, é só exportar o token gerado pelo manifest do `ServiceAccount` e usar ele durante o login no dashboard.
+
+# Executando o projeto
+
+Dadas as instruções acima, para carregar o ambiente é só usar o comando abaixo, que irá criar 3 instâncias de Ubuntu 21.10, instalar todas as dependências, instalar o kubeadm e startar o cluster, adicionando os plugins citados acima.
+
+```bash
 vagrant up
 ```
 
-## To check the cluster status
+## Checando o status do cluster e dos pods iniciais do Kubernetes
 
-```
+Para a operação do cluster, você pode logar no control node com o comando `vagrant ssh control-node` ou se não quiser entrar na instância, pode usar conforme listado abaixo, por exemplo, para pegar as informações dos pods.
+
+```bash
 vagrant ssh control-node -c "kubectl get pods -n kube-system"
 vagrant ssh control-node -c "kubectl get nodes"
 ```
 
-## To check the cluster memory and CPU usage
+Com a instalação do plugin de métricas, você pode checar o uso de memória e CPU dos nós e pods com os comandos abaixo:
 
-```
+```bash
 vagrant ssh control-node -c "kubectl top pod -n kube-system"
 vagrant ssh control-node -c "kubectl top nodes"
 ```
 
-## To connect to the dashboard
+## Conectando-se ao Dashboard
 
-First, you have to get the admin token created on kubernetes secret
+Primeiramente, você precisa buscar o token criado no script `scripts/34-dashboard.sh` com o seguinte comando:
 
-```
+```bash
 vagrant ssh control-node -c "kubectl -n kube-system get secret --template='{{.data.token}}' \$(kubectl -n kube-system get secret | grep admin-user | awk '{print \$1}') | base64 --decode ; echo"
 ```
 
-After that, you run kubectl proxy on the console to output the dashboard endpoint
+Após receber esse token, é necessário rodar o comando abaixo para disponibilizar o endpoint do dashboard:
 
-```
+```bash
 vagrant ssh control-node -c "kubectl proxy"
 
 ```
 
-After this, you can access the dashboard on the URL: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/ using the token retrieved before.
+Feito isso, você pode acessar o dashboard, usando o token retornado na instrução anterior, através da URL http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 
-# Destroying everything and freeing resources
+## Destruindo o ambiente de estudos e liberando os recursos alocados
 
+Para apagar o cluster e todos os recursos criados, é só usar o comando abaixo. Também pode ser usado caso você queira recriar o ambiente do zero.
 
 ```
 vagrant destroy -f
 ```
+
+# Considerações finais
+
+Como dito mais acima, este repositório é um esforço de estudo de como fazer deploy de um cluster Kubernetes usando o comando `kubeadm`, e todas as situações passadas por mim neste processo eu documentei ou neste README ou através de comentários nos arquivos dos scripts, que são separados segundo as fases que estão sendo efetuadas no momento, para deixar mais claro e organizado.
+
+Em tempo, esse deploy não foi testado em um ambiente Windows, somente em um ambiente Linux (Linux Mint 20.2 Uma). Caso vocês encontrem algum problema com a execução deste repositório em outros ambientes, sintam-se à vontade de enviar contribuições e/ou até PRs com correções ou adições ao script.

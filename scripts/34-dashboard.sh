@@ -8,7 +8,8 @@ cat <<EOF | sudo tee /etc/sysctl.d/99-local-routing.conf > /dev/null
 net.ipv4.conf.enp0s3.route_localnet=1
 EOF
 
-# Reinicialização do serviço sysctl pois o comando `sysctl -p` dá erro quando roda, por conflito com o daemon do Systemd
+# Reinicialização do serviço sysctl pois o comando `sysctl -p` dá erro quando roda,
+# por conflito com o daemon do Systemd
 sudo systemctl daemon-reload
 sudo systemctl restart systemd-sysctl
 
