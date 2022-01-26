@@ -4,6 +4,8 @@ echo "##################################################################"
 echo "############### Instalação do plugin de dashboard ################"
 echo "##################################################################"
 
+# Configuração do kernel para permitir o roteamento de tráfego entre interfaces
+# de rede locais
 cat <<EOF | sudo tee /etc/sysctl.d/99-local-routing.conf > /dev/null
 net.ipv4.conf.enp0s3.route_localnet=1
 EOF
@@ -13,6 +15,9 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl restart systemd-sysctl
 
+# Criação de regra no iptables que redireciona o tráfego de rede que chegar na
+# interface NAT do control node diretamente para a interface lo, permitindo assim
+# o acesso ao dashboard usando a forwarded port configurada no `Vagrantfile`
 sudo iptables -t nat -I PREROUTING -p tcp -d 169.254.0.15/32 --dport 8001 -j DNAT --to-destination 127.0.0.1:8001
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.4.0/aio/deploy/recommended.yaml
