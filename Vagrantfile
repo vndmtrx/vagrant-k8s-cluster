@@ -7,7 +7,7 @@ WORKERS = 2
 MEMORIA = 2048
 CPUS = 2
 OCI = "Containerd"
-CNI = "Calico"
+CNI = "Flannel"
 
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
