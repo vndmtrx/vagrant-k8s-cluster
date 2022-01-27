@@ -19,7 +19,12 @@ sed -i 's/kube-subnet-mgr/&\n        - --iface=enp0s8/' kube-flannel.yaml
 # Explicação: https://blog.laputa.io/kubernetes-flannel-networking-6a1cb1f8ec7c
 sed -i 's/10.244.0.0\/16/172.17.0.0\/16/g' kube-flannel.yaml
 
+# Para remover o warning do `PodDisruptionBudget` durante a instalação do CNI, pois
+# este foi movido da versão `v1beta1` para a versão `v1` da API.
+sed -i '/apiVersion: policy\/v1beta1/s/v1beta1/v1/' kube-flannel.yaml
+
 kubectl apply -f kube-flannel.yaml
 #Qdo fizer para Flannel, atentar a isso aqui: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/troubleshooting-kubeadm/#default-nic-when-using-flannel-as-the-pod-network-in-vagrant
 
+#kubectl get daemonsets --all-namespaces -o wide
 #kubectl logs -l app=flannel -n kube-system -f
