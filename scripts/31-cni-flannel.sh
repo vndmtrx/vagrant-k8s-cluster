@@ -8,7 +8,8 @@ echo "######################################################"
 
 curl -fsSLo kube-flannel.yaml https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
 
-# Internamente o Flannel está tentando pegar a primeira interface de rede
+# Internamente o Flannel está tentando pegar a primeira interface de rede, ligada
+# ao NAT do vagrant, e portanto não acessível externamente.
 sed -i 's/kube-subnet-mgr/&\n        - --iface=enp0s8/' kube-flannel.yaml
 
 # O Flannel por padrão vêm com a rede `10.244.0.0/16` configurada para o parâmetro
