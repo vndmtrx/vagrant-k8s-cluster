@@ -16,6 +16,7 @@ sed -i 's/kube-subnet-mgr/&\n        - --iface=enp0s8/' kube-flannel.yaml
 # `FLANNEL_NETWORK`, que pode ser visto no arquivo `/run/flannel/subnet.env`.
 # Para manter o mesmo padrão de rede usado no projeto, mudamos o valor no ConfigMap
 # para o valor que está definido para a nossa rede de pods.
+# Explicação: https://blog.laputa.io/kubernetes-flannel-networking-6a1cb1f8ec7c
 sed -i 's/10.244.0.0\/16/172.17.0.0\/16/g' kube-flannel.yaml
 
 kubectl apply -f kube-flannel.yaml
