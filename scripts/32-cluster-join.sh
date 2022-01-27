@@ -4,7 +4,7 @@ echo "###################################################################"
 echo "############### Geração do comando de Join do Node ################"
 echo "###################################################################"
 
-kubeadm token create --print-join-command | tee /tmp/k8s/control-node-join.sh
+kubeadm token create --print-join-command | tee /tmp/k8s/control-plane-join.sh
 sudo cp -f /etc/kubernetes/admin.conf /tmp/k8s/cluster-admin.conf
 
 sleep 30s

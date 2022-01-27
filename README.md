@@ -23,11 +23,11 @@ Uma coisa para qual esse repositório foi pensado foi a de ser possível customi
 
 3. Foi criada uma interface de rede pública na máquina virtual, no modo bridge, para permitir acesso do cluster da rede local do usuário e não só via comandos do Vagrant. Desta forma, se a máquina onde estiver rodando o script possuir mais de uma placa de rede, será necessário escolher uma das disponíveis para fazer a vinculação;
 
-4. No control node (linha [13](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-node.sh#L13) do arquivo `scripts/30-control-node.sh`) foi decidido usar as redes `172.16.0.0/16` e `172.17.0.0/16` para a alocação de IPs dos serviços (`--service-cidr`) e dos pods (`--pod-network-cidr`), respectivamente. Isso pode gerar um conflito de roteamento e também possíveis problemas com os serviços CoreDNS e Calico dentro do Kubernetes caso a rede local da máquina host seja neste range de IPs;
+4. No control node (linha [13](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-plane.sh#L13) do arquivo `scripts/30-control-plane.sh`) foi decidido usar as redes `172.16.0.0/16` e `172.17.0.0/16` para a alocação de IPs dos serviços (`--service-cidr`) e dos pods (`--pod-network-cidr`), respectivamente. Isso pode gerar um conflito de roteamento e também possíveis problemas com os serviços CoreDNS e Calico dentro do Kubernetes caso a rede local da máquina host seja neste range de IPs;
 
-5. Ainda no control node, o endereço de anúncio do Kubernetes (`--apiserver-advertise-address` e `--apiserver-cert-extra-sans`) foi vinculado à interface pública criada no `Vagrantfile`. Da mesma forma, o endpoint (`--control-plane-endpoint`) faz referência à entrada criada dentro do `/etc/hosts` (linhas [9](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-node.sh#L9) e [11](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-node.sh#L11)).
+5. Ainda no control node, o endereço de anúncio do Kubernetes (`--apiserver-advertise-address` e `--apiserver-cert-extra-sans`) foi vinculado à interface pública criada no `Vagrantfile`. Da mesma forma, o endpoint (`--control-plane-endpoint`) faz referência à entrada criada dentro do `/etc/hosts` (linhas [9](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-plane.sh#L9) e [11](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-plane.sh#L11)).
 
-6. Na imagem do Ubuntu 21.10 (usada neste repositório) a interface de rede criada vêm com o nome `enp0s8` (linha [7](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-node.sh#L7)). Se a imagem for alterada, é importante atentar para este detalhe, pois a nomenclatura da interface pode mudar entre distribuições. No entanto, devido à forma como o VirtualBox cria as interfaces, a interface pública é sempre a segunda placa de rede, sendo a primeira do NAT usado pelo Vagrant.
+6. Na imagem do Ubuntu 21.10 (usada neste repositório) a interface de rede criada vêm com o nome `enp0s8` (linha [7](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-plane.sh#L7)). Se a imagem for alterada, é importante atentar para este detalhe, pois a nomenclatura da interface pode mudar entre distribuições. No entanto, devido à forma como o VirtualBox cria as interfaces, a interface pública é sempre a segunda placa de rede, sendo a primeira do NAT usado pelo Vagrant.
 
 ### Docker e/ou Containerd
 
@@ -67,18 +67,18 @@ vagrant up
 
 ## Checando o status do cluster e dos pods iniciais do Kubernetes
 
-Para a operação do cluster, você pode logar no control node com o comando `vagrant ssh control-node` ou se não quiser entrar na instância, pode usar conforme listado abaixo, por exemplo, para pegar as informações dos pods.
+Para a operação do cluster, você pode logar no control node com o comando `vagrant ssh control-plane` ou se não quiser entrar na instância, pode usar conforme listado abaixo, por exemplo, para pegar as informações dos pods.
 
 ```bash
-vagrant ssh control-node -c "kubectl get pods -n kube-system"
-vagrant ssh control-node -c "kubectl get nodes"
+vagrant ssh control-plane -c "kubectl get pods -n kube-system"
+vagrant ssh control-plane -c "kubectl get nodes"
 ```
 
 Com a instalação do plugin de métricas, você pode checar o uso de memória e CPU dos nós e pods com os comandos abaixo:
 
 ```bash
-vagrant ssh control-node -c "kubectl top pod -n kube-system"
-vagrant ssh control-node -c "kubectl top nodes"
+vagrant ssh control-plane -c "kubectl top pod -n kube-system"
+vagrant ssh control-plane -c "kubectl top nodes"
 ```
 
 ## Conectando-se ao Dashboard
@@ -86,13 +86,13 @@ vagrant ssh control-node -c "kubectl top nodes"
 Primeiramente, você precisa buscar o token criado no script `scripts/34-dashboard.sh` com o seguinte comando:
 
 ```bash
-vagrant ssh control-node -c "kubectl -n kube-system get secret --template='{{.data.token}}' \$(kubectl -n kube-system get secret | grep admin-user | awk '{print \$1}') | base64 --decode ; echo"
+vagrant ssh control-plane -c "kubectl -n kube-system get secret --template='{{.data.token}}' \$(kubectl -n kube-system get secret | grep admin-user | awk '{print \$1}') | base64 --decode ; echo"
 ```
 
 Após receber esse token, é necessário rodar o comando abaixo para disponibilizar o endpoint do dashboard:
 
 ```bash
-vagrant ssh control-node -c "kubectl proxy"
+vagrant ssh control-plane -c "kubectl proxy"
 
 ```
 

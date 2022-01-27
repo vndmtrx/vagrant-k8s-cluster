@@ -8,7 +8,7 @@ echo "##############################################################"
 export DEBIAN_FRONTEND=noninteractive
 
 # Instalação das dependências do Docker (utils, certificado, repositório)
-apt-get install -yq curl gnupg apt-transport-https software-properties-common ca-certificates lsb-release
+apt-get install -yq curl gnupg apt-transport-https software-properties-common ca-certificates lsb-release bash-completion
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 

@@ -15,3 +15,7 @@ sudo kubeadm init --control-plane-endpoint "$HOST:6443" --apiserver-advertise-ad
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+echo "alias k='kubectl'" >> ~/.bashrc
+echo "source <(kubectl completion bash)" >> ~/.bashrc
+echo "complete -F __start_kubectl k" >> ~/.bashrc
