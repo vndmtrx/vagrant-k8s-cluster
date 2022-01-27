@@ -9,5 +9,19 @@ sed -i 's/secure-port=4443/&\n        - --kubelet-insecure-tls/' kubernetes-metr
 
 kubectl apply -f kubernetes-metrics.yaml
 
+cat <<EOF | tee metrics-patch.yml > /dev/null
+spec:
+  template:
+    spec:
+      tolerations:
+        - key: "CriticalAddonsOnly"
+          operator: "Exists"
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+          effect: "NoSchedule"
+EOF
+
+kubectl patch deployment metrics-server -n kube-system --patch-file metrics-patch.yml
+
 #kubectl top pods -n kube-system
 #kubectl top nodes

@@ -49,7 +49,9 @@ Em breve pretendo colocar a instalação do plugin de redes usando o Cillium, pa
 
 #### Metrics
 
-No plugin de métricas, somente uma alteração foi feita no manifest, para que não fosse necessário o uso de um certificado TLS de autoridade certificadora, permitindo o uso do certificado gerado pelo `kubeadm init`, através da inserção da opção `--kubelet-insecure-tls`.
+No plugin de métricas, foi feita uma alteração foi feita no manifest, para que não fosse necessário o uso de um certificado TLS de autoridade certificadora, permitindo o uso do certificado gerado pelo `kubeadm init`, através da inserção da opção `--kubelet-insecure-tls`.
+
+Adicionalmente, foi feita a adição de um patch no deployment do plugin para permitir que os pods do plugin de métricas pudessem ser executados no control-plane, pois este somente aceita pods cuja role seja `node-role.kubernetes.io/master`, o que não é o caso do plugin de métricas, no ato da instalação (dica dada no issue [#1402](https://github.com/k3s-io/k3s/issues/1402) do projeto [k3s](https://github.com/k3s-io/k3s/)).
 
 #### Dashboard
 
