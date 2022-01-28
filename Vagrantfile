@@ -7,7 +7,7 @@ WORKERS = 2
 MEMORIA = 2048
 CPUS = 2
 OCI = "Containerd"
-CNI = "Flannel"
+CNI = "Calico"
 
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
@@ -55,6 +55,7 @@ Vagrant.configure("2") do |config|
     cn.vm.provision "shell", path: "scripts/32-cluster-join.sh", privileged: false
     cn.vm.provision "shell", path: "scripts/33-metrics.sh", privileged: false
     cn.vm.provision "shell", path: "scripts/34-dashboard.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/35-helm.sh", privileged: false
   end
 
   # Configurações específicas dos worker nodes

@@ -37,11 +37,15 @@ Para a instalação do Docker, não foi feita nenhuma alteração na forma como 
 
 Para a instalação do Containerd, são necessárias algumas etapas já que o Docker faz muita coisa "magicamente" por nós. Aqui é onde as coisas começam a ficar um pouco nebulosas. Apesar de os desenvolvedores do Kubernetes falarem que as coisas funcionam sem nenhum ajuste maior, isso só acontece quando você usa do Docker como backend de conteineres. O Docker faz um monte de coisas pra por trás dos panos que, quando você migra para o Containerd, você precisa fazer essas configurações de forma manual. As instruções de instalação do Containerd estão detalhadas nos comentários do arquivo `scripts/10-oci-containerd.sh`.
 
+Por padrão o projeto vê com o Containerd setado como engine de conteineres.
+
 ### Calico e/ou Flannel
 
 Para a configuração do plugin de rede que o Kubernetes irá usar primeiramente usamos o Calico pela simplicidade de configuração, já que na versão atual ele importa as configurações de pods e serviços direto do Kubernetes, não sendo necessário nenhum ajuste na configuração. No entanto, caso seja necessário usar uma configuração personalizada (especificamente de rede), eu deixei comentado alterações no arquivo `calico.yaml` que é baixado para a implantação da rede. As alterações são no pool de IPs que o Calico pode usar. Como disse, o Calico atualmente é inteligente o suficiente para encontrar essas informações, considerando que elas tenham sido passadas para o comando `kubeadm init` pelos parâmetros `--service-cidr` e `--pod-network-cidr`. Em tempo, um warning foi removido da instalação do Calico, devido a versão da API que foi trocada de `apiVersion: policy/v1beta1` para `apiVersion: policy/v1`, segundo a [documentação](https://kubernetes.io/docs/tasks/run-application/configure-pdb/).
 
-Ainda não foi feita a configuração do plugin de redes usando o Flannel, mas já deixei o arquivo ali disponível para estudo futuro do deploy automatizado do mesmo.
+Para a configuração do plugin de rede do Flannel, foram feitas algumas alterações no arquivo de instalação do CNI. A primeira delas é referente à interface de rede que o Flannel irá usar para construir o overlay (linha [13](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/31-cni-flannel.sh#L13)). Adicionalmente, foi feita a alteração da rede de pods para uso do Flannel. O Flannel por padrão vêm com a rede `10.244.0.0/16` configurada para o parâmetro `FLANNEL_NETWORK`, que pode ser visto no arquivo `/run/flannel/subnet.env`. Para manter o mesmo padrão de rede usado no projeto, mudamos o valor no ConfigMap (linha [20](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/31-cni-flannel.sh#L20)) para o valor que está definido para a nossa rede de pods, conforme explicado no post [Kubernetes: Flannel networking](https://blog.laputa.io/kubernetes-flannel-networking-6a1cb1f8ec7c).
+
+Por padrão, o projeto vêm com o Calico setado como plugin de rede.
 
 Em breve pretendo colocar a instalação do plugin de redes usando o Cillium, para tirar proveito das facilidades do eBPF em relação ao iptables.
 
@@ -58,6 +62,10 @@ Adicionalmente, foi feita a adição de um patch no deployment do plugin para pe
 Já o plugin de dashboard, entregue pelo comando `kubectl proxy`, só permite o acesso à URL através do endereço localhost da máquina guest, desta forma inviabilizando o seu acesso pelo usuário. Assim sendo, foi feita uma configuração de rota no iptables (linha [16](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/34-dashboard.sh#L21)) para que os acessos que chegassem através do port forward do vagrant (linha [39](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/Vagrantfile#L39)) (e que são entregues pela rede NAT) fossem redirecionados via regra DNAT para o localhost, assim permitindo o acesso do dashboard neste nosso exemplo. Esta não é a forma correta de se fazer, mas para questões de estudo, esta forma é a que menos impacta em alteração das configurações de instalação do plugin.
 
 Ainda sobre o dashboard, ao acessar o mesmo usando o arquivo `cluster-admin.conf` gerado pelo comando `kubeadm init`, o dashboard nos retornava um erro de *Not enough data to create auth info structure*. Este problema é bem explicado neste [issue](https://github.com/kubernetes/dashboard/issues/2474) no repo do kubernetes. Para resolver esse problema, nós criamos uma conta admin usando `ServiceAccount` e em seguida aplicamos uma `ClusterRoleBinding` no usuário. Com isso, é só exportar o token gerado pelo manifest do `ServiceAccount` e usar ele durante o login no dashboard.
+
+#### Helm
+
+Foi instalado o executável do Helm na máquina, para a instalação de charts que porventura possam ser usados durante as experimentações e estudos com o Kubernetes. O arquivo é o `scripts/35-helm.sh`.
 
 # Executando o projeto
 
