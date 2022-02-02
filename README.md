@@ -120,4 +120,4 @@ vagrant destroy -f
 
 Como dito mais acima, este repositório é um esforço de estudo de como fazer deploy de um cluster Kubernetes usando o comando `kubeadm`, e todas as situações passadas por mim neste processo foram documentadas ou neste README ou através de comentários nos arquivos dos scripts, que são separados segundo as fases que estão sendo efetuadas no momento, para deixar mais claro e organizado.
 
-Em tempo, esse deploy não foi testado em um ambiente Windows, somente em um ambiente Linux (Linux Mint 20.2 Uma). Caso vocês encontrem algum problema com a execução deste repositório em outros ambientes, sintam-se à vontade de enviar contribuições e/ou até PRs com correções ou adições ao script.
+Em tempo, esse deploy não foi testado em um ambiente Windows, somente em um ambiente Linux (Linux Mint 20.2 Uma). Caso você encontre algum problema com a execução deste repositório em outros ambientes, sintam-se à vontade de enviar contribuições e/ou até PRs com correções ou adições ao script.
