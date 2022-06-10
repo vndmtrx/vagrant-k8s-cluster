@@ -20,14 +20,14 @@ sudo systemctl restart systemd-sysctl
 # o acesso ao dashboard usando a forwarded port configurada no `Vagrantfile`
 sudo iptables -t nat -I PREROUTING -p tcp -d 169.254.0.15/32 --dport 8001 -j DNAT --to-destination 127.0.0.1:8001
 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.4.0/aio/deploy/recommended.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.0/aio/deploy/recommended.yaml
 
 cat <<EOF | tee dashboard-adminuser.yml > /dev/null
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: admin-user
-  namespace: kube-system
+  namespace: kubernetes-dashboard
 EOF
 
 kubectl apply -f dashboard-adminuser.yml
@@ -44,10 +44,12 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: admin-user
-  namespace: kube-system
+  namespace: kubernetes-dashboard
 EOF
 
 kubectl apply -f admin-role-binding.yml
 
-#kubectl -n kube-system get secret --template='{{.data.token}}' $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | base64 --decode ; echo
-#kubectl proxy
+#Não usar mais: kubectl -n kube-system get secret --template='{{.data.token}}' $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | base64 --decode ; echo
+#kubectl -n kubernetes-dashboard create token admin-user
+#kubectl proxy --accept-hosts='.*'
+#http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/

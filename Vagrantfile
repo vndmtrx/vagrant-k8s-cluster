@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 ## https://kubernetes.io/blog/2019/03/15/kubernetes-setup-using-ansible-and-vagrant/
 
-IMAGEM = "ubuntu/impish64"
+IMAGEM = "ubuntu/jammy64"
 WORKERS = 2
 MEMORIA = 2048
 CPUS = 2
@@ -21,10 +21,16 @@ Vagrant.configure("2") do |config|
   # Configuração da pasta de montagem dos arquivos gerados pelo control node
   config.vm.synced_folder "./data", "/tmp/k8s", create: true
 
+  # Para funcionar, é necessário instalar o plugin vagrant-reload: vagrant plugin install vagrant-reload
+  config.vm.provision "shell", path: "scripts/00-grub-config.sh"
+  config.vm.provision :reload
+
   # Seletor do script de instalação da engine de contêiner
   case OCI
   when "Containerd"
     config.vm.provision "shell", path: "scripts/10-oci-containerd.sh"
+  when "CRI-O"
+    config.vm.provision "shell", path: "scripts/10-oci-crio.sh"
   else #Docker
     config.vm.provision "shell", path: "scripts/10-oci-docker.sh"
   end

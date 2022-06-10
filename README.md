@@ -27,15 +27,20 @@ Uma coisa para qual esse repositório foi pensado foi a de ser possível customi
 
 5. Ainda no control node, o endereço de anúncio do Kubernetes (`--apiserver-advertise-address` e `--apiserver-cert-extra-sans`) foi vinculado à interface pública criada no `Vagrantfile`. Da mesma forma, o endpoint (`--control-plane-endpoint`) faz referência à entrada criada dentro do `/etc/hosts` (linhas [9](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-plane.sh#L9) e [11](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-plane.sh#L11)).
 
-6. Na imagem do Ubuntu 21.10 (usada neste repositório) a interface de rede criada vêm com o nome `enp0s8` (linha [7](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-plane.sh#L7)). Se a imagem for alterada, é importante atentar para este detalhe, pois a nomenclatura da interface pode mudar entre distribuições. No entanto, devido à forma como o VirtualBox cria as interfaces, a interface pública é sempre a segunda placa de rede, sendo a primeira do NAT usado pelo Vagrant.
+6. Continuando no control node, foi feito o taint do nó para permitir que pods sejam agendados no mesmo, assim aumentando a disponibilidade deste cluster de testes.
 
-### Docker e/ou Containerd
+6. Na imagem do Ubuntu 22.04 (usada neste repositório) a interface de rede criada vêm com o nome `enp0s8` (linha [7](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/30-control-plane.sh#L7)). Se a imagem for alterada, é importante atentar para este detalhe, pois a nomenclatura da interface pode mudar entre distribuições. No entanto, devido à forma como o VirtualBox cria as interfaces, a interface pública é sempre a segunda placa de rede, sendo a primeira do NAT usado pelo Vagrant.
 
-Primeiramente, para a montagem deste tutorial foi feita a instalação do cluster com o Docker, seguindo as configurações de instalação da [Documentação do Docker](https://docs.docker.com/engine/install/) e resumidas no script de instalação `scripts/10-oci-docker.sh` e posteriormente foi adicionada a possibilidade de usar o Containerd como engine OCI, que está disponível no script `scripts/10-oci-containerd.sh`. A opção sobre qual engine OCI usar pode ser configurada na variável OCI dentro do arquivo `Vagrantfile`.
+7. Ainda sobre a imagem do Ubuntu, devido ao fato de a imagem não vir com o agendamento de CGroups habilitada no kernel, foi necessário fazer a customização da string de inicialização do kernel no Grub. Devido a este fato, é necessária a instalação do plugin vagrant-reload para que a instância seja reinicializada após a alteração do grub da instância. A instalação pode ser feita através do comando `vagrant plugin install vagrant-reload`.
 
-Para a instalação do Docker, não foi feita nenhuma alteração na forma como é feita a instalação, sendo o mesmo do tutorial apresentado na documentação [Container Runtimes](https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker).
+### Containerd e/ou CRI-O
+
 
 Para a instalação do Containerd, são necessárias algumas etapas já que o Docker faz muita coisa "magicamente" por nós. Aqui é onde as coisas começam a ficar um pouco nebulosas. Apesar de os desenvolvedores do Kubernetes falarem que as coisas funcionam sem nenhum ajuste maior, isso só acontece quando você usa do Docker como backend de conteineres. O Docker faz um monte de coisas pra por trás dos panos que, quando você migra para o Containerd, você precisa fazer essas configurações de forma manual. As instruções de instalação do Containerd estão detalhadas nos comentários do arquivo `scripts/10-oci-containerd.sh`.
+
+Para a instalação do CRI-O foi utilizado um repositório APT do OpenSUSE que já vêm com as ferramentas do CRI-O disponíveis para instalação no Ubuntu. No entanto, elas ainda não estão disponíveis para o Ubuntu 22.04, mas as da versão 20.04 ainda são compatíveis.
+
+A instalação do Docker foi removida pois não conseguimos fazer a mesma funcionar após a atualização.
 
 Por padrão o projeto vê com o Containerd setado como engine de conteineres.
 
@@ -96,13 +101,13 @@ vagrant ssh control-plane -c "kubectl top nodes"
 Primeiramente, você precisa buscar o token criado no script `scripts/34-dashboard.sh` com o seguinte comando:
 
 ```bash
-vagrant ssh control-plane -c "kubectl -n kube-system get secret --template='{{.data.token}}' \$(kubectl -n kube-system get secret | grep admin-user | awk '{print \$1}') | base64 --decode ; echo"
+vagrant ssh control-plane -c "kubectl -n kubernetes-dashboard create token admin-user"
 ```
 
 Após receber esse token, é necessário rodar o comando abaixo para disponibilizar o endpoint do dashboard:
 
 ```bash
-vagrant ssh control-plane -c "kubectl proxy"
+vagrant ssh control-plane -c "kubectl proxy --accept-hosts='.*'"
 
 ```
 
@@ -112,7 +117,7 @@ Feito isso, você pode acessar o dashboard, usando o token retornado na instruç
 
 Para apagar o cluster e todos os recursos criados, é só usar o comando abaixo. Também pode ser usado caso você queira recriar o ambiente do zero.
 
-```
+```bash
 vagrant destroy -f
 ```
 

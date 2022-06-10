@@ -46,7 +46,8 @@ containerd config default | tee /etc/containerd/config.toml > /dev/null
 # Configuração do daemon do Containerd para usar o Systemd como driver de cgroup,
 # pois na configuração padrão gerada acima, essa informação não é adicionada, e
 # sem ela os pods ficam eternamente em CrashLoopBackoff
-sed -i 's/\[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options\]/&\n            SystemdCgroup = true/' /etc/containerd/config.toml
+#sed -i 's/\[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options\]/&\n            SystemdCgroup = true/' /etc/containerd/config.toml
+sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 
 # Inicialização do serviço do Containerd
 systemctl enable containerd
