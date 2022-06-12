@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "./data", "/tmp/k8s", create: true
 
   # Para funcionar, é necessário instalar o plugin vagrant-reload: vagrant plugin install vagrant-reload
-  config.vm.provision "shell", path: "scripts/00-grub-config.sh"
+  config.vm.provision "shell", path: "scripts/00-base.sh"
   config.vm.provision :reload
 
   # Seletor do script de instalação da engine de contêiner

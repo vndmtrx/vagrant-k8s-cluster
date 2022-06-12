@@ -49,6 +49,27 @@ EOF
 
 kubectl apply -f admin-role-binding.yml
 
+cat <<EOF | tee dashboard-nodeport.yml > /dev/null
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+spec:
+  ports:
+    - port: 443
+      targetPort: 8443
+      nodePort: 32000
+  selector:
+    k8s-app: kubernetes-dashboard
+  type: NodePort
+EOF
+
+kubectl apply -f dashboard-nodeport.yml
+
+
 #Não usar mais: kubectl -n kube-system get secret --template='{{.data.token}}' $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | base64 --decode ; echo
 #kubectl -n kubernetes-dashboard create token admin-user
 #kubectl proxy --accept-hosts='.*'

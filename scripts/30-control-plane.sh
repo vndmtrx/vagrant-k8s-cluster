@@ -12,9 +12,6 @@ echo "$IP $HOST" | sudo tee -a /etc/hosts | sudo tee /tmp/k8s/hosts-entry
 
 sudo kubeadm init --control-plane-endpoint "$HOST:6443" --apiserver-advertise-address "$IP" --apiserver-cert-extra-sans "$IP" --pod-network-cidr "172.17.0.0/16" --service-cidr "172.16.0.0/16" --node-name "$HOST"
 
-# Permitindo o agendamento de pods no control-plane
-kubectl taint nodes --all node-role.kubernetes.io/master-
-
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
