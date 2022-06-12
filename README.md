@@ -38,9 +38,9 @@ Uma coisa para qual esse repositório foi pensado foi a de ser possível customi
 
 Para a instalação do Containerd, são necessárias algumas etapas já que o Docker faz muita coisa "magicamente" por nós. Aqui é onde as coisas começam a ficar um pouco nebulosas. Apesar de os desenvolvedores do Kubernetes falarem que as coisas funcionam sem nenhum ajuste maior, isso só acontece quando você usa do Docker como backend de conteineres. O Docker faz um monte de coisas pra por trás dos panos que, quando você migra para o Containerd, você precisa fazer essas configurações de forma manual. As instruções de instalação do Containerd estão detalhadas nos comentários do arquivo `scripts/10-oci-containerd.sh`.
 
-Para a instalação do CRI-O foi utilizado um repositório APT do OpenSUSE que já vêm com as ferramentas do CRI-O disponíveis para instalação no Ubuntu. No entanto, elas ainda não estão disponíveis para o Ubuntu 22.04, mas as da versão 20.04 ainda são compatíveis.
+Para a instalação do CRI-O foi utilizado um repositório APT do OpenSUSE que já vêm com as ferramentas do CRI-O disponíveis para instalação no Ubuntu. No entanto, elas ainda não estão disponíveis para o Ubuntu 22.04, mas as da versão 20.04 ainda são compatíveis. As instruções de instalação do CRI-O estão detalhadas nos comentários do arquivo `scripts/10-oci-crio.sh`.
 
-A instalação do Docker foi removida pois não conseguimos fazer a mesma funcionar após a atualização.
+A instalação do Docker foi removida pois não conseguimos fazer a mesma funcionar após a atualização. No entanto, o script ainda encontra-se disponível em `scripts/10-oci-docker.sh`.
 
 Por padrão o projeto vê com o Containerd setado como engine de conteineres.
 
@@ -68,13 +68,15 @@ Já o plugin de dashboard, entregue pelo comando `kubectl proxy`, só permite o 
 
 Ainda sobre o dashboard, ao acessar o mesmo usando o arquivo `cluster-admin.conf` gerado pelo comando `kubeadm init`, o dashboard nos retornava um erro de *Not enough data to create auth info structure*. Este problema é bem explicado neste [issue](https://github.com/kubernetes/dashboard/issues/2474) no repo do kubernetes. Para resolver esse problema, nós criamos uma conta admin usando `ServiceAccount` e em seguida aplicamos uma `ClusterRoleBinding` no usuário. Com isso, é só exportar o token gerado pelo manifest do `ServiceAccount` e usar ele durante o login no dashboard.
 
+Ainda sobre o Dashboard, inicialmente é possível acessá-lo através do comando `kubectl proxy` e a URL [http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/). No entanto, para simplificar um pouco mais o acesso, implantamos um serviço NodePort (linhas [52 a 70](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/34-dashboard.sh#L52-L70)) que aponta para a porta do Dashboard e nos permite acessar o mesmo através do IP dos nós, na porta 32000. Assim, não é necessário chamar o `kubectl proxy` todas as vezes, permitindo inclusive acesso de outros locais que não aqueles de onde estamos executando o `kubectl`.
+
 #### Helm
 
 Foi instalado o executável do Helm na máquina, para a instalação de charts que porventura possam ser usados durante as experimentações e estudos com o Kubernetes. O arquivo é o `scripts/35-helm.sh`.
 
 # Executando o projeto
 
-Dadas as instruções acima, para carregar o ambiente é só usar o comando abaixo, que irá criar 3 instâncias de Ubuntu 21.10, instalar todas as dependências, instalar o kubeadm e startar o cluster, adicionando os plugins citados acima.
+Dadas as instruções acima, para carregar o ambiente é só usar o comando abaixo, que irá criar 3 instâncias de Ubuntu 22.04, instalar todas as dependências, instalar o `kubeadm` e startar o cluster, adicionando os plugins citados acima.
 
 ```bash
 vagrant up
@@ -111,7 +113,17 @@ vagrant ssh control-plane -c "kubectl proxy --accept-hosts='.*'"
 
 ```
 
-Feito isso, você pode acessar o dashboard, usando o token retornado na instrução anterior, através da URL http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+Feito isso, você pode acessar o dashboard, usando o token retornado na instrução anterior, através da URL [http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/)
+
+### Outra opção de acesso ao Dashboard
+
+Na última atualização deste projeto, adicionamos um service do tipo NodePort que permite acessarmos o dashboard sem precisar usar a URL do `kubectl proxy`. Como o service é do tipo NodePort, seu acesso pode ser feito através da URL https://IP-DO-NÓ:32000/, lembrando que é necessário neste caso trocar o texto `IP-DO-NÓ` pelo IP de algum dos nós criados no cluster (você pode conferir os IPs através do comando `kubectl get nodes -o wide` e anotar a informação `INTERNAL-IP`). O token para acessar o dashboard é o mesmo que foi gerado na opção acima.
+
+## Exemplos de deploys e continuação dos estudos
+
+Com o objetivo de ajudar nos estudos de Kubernetes, estou também deixando alguns scripts na pasta `exemplos/` para que vocês possam subir e experimentar com o cluster. Nem todos estão bem documentados, e com o passar o tempo, vou melhorar isto, para se tornar uma ferramenta de referência simples do que fazer em cada etapa.
+
+Outra coisa interessante, caso vocês tenham dúvidas sobre o que uma determinada configuração do arquivo YAML significa, vocês podem usar o comando `kubectl explain` para ler sobre aquilo. Por exemplo, `kubectl explain deployment.spec.selector` vai te mostrar a descrição de como é feita a seleção dos pods para a criação do ReplicaSet dentro do Deployment.
 
 ## Destruindo o ambiente de estudos e liberando os recursos alocados
 
