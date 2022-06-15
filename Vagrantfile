@@ -12,7 +12,8 @@ CNI = "Calico"
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
 
-  config.vm.network "public_network"
+  #config.vm.network "public_network", :adapter => 2
+  config.vm.network "private_network", :type => 'dhcp', :adapter => 2
 
   if Vagrant.has_plugin?("vagrant-vbguest")
     config.vbguest.auto_update = false

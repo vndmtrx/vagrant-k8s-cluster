@@ -10,7 +10,7 @@ HOST=`hostname -s`.cluster
 
 echo "$IP $HOST" | sudo tee -a /etc/hosts | sudo tee /tmp/k8s/hosts-entry
 
-sudo kubeadm init --control-plane-endpoint "$HOST:6443" --apiserver-advertise-address "$IP" --apiserver-cert-extra-sans "$IP" --pod-network-cidr "172.17.0.0/16" --service-cidr "172.16.0.0/16" --node-name "$HOST"
+sudo kubeadm init --control-plane-endpoint=$HOST:6443 --apiserver-advertise-address=$IP --apiserver-cert-extra-sans=$IP --pod-network-cidr=172.17.0.0/16 --service-cidr=172.16.0.0/16 --node-name=$HOST
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
