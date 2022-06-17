@@ -2,6 +2,9 @@
 # vi: set ft=ruby :
 ## https://kubernetes.io/blog/2019/03/15/kubernetes-setup-using-ansible-and-vagrant/
 
+### vagrant plugin install vagrant-reload
+### vagrant plugin install vagrant-hosts
+
 IMAGEM = "ubuntu/jammy64"
 WORKERS = 2
 MEMORIA = 2048
@@ -11,9 +14,6 @@ CNI = "Calico"
 
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
-
-  #config.vm.network "public_network", :adapter => 2
-  config.vm.network "private_network", :type => 'dhcp', :adapter => 2
 
   if Vagrant.has_plugin?("vagrant-vbguest")
     config.vbguest.auto_update = false
@@ -43,6 +43,8 @@ Vagrant.configure("2") do |config|
   config.vm.define "control-plane" do |cn|
     cn.vm.box = IMAGEM
     cn.vm.hostname = "control-plane"
+    cn.vm.network "private_network", :ip => "192.168.56.10", :adapter => 2
+    cn.vm.provision :hosts, :sync_hosts => true
     cn.vm.network "forwarded_port", guest: 8001, host: 8001, auto_correct: true
     cn.vm.provider "virtualbox" do |v|
       v.memory = MEMORIA
@@ -70,6 +72,8 @@ Vagrant.configure("2") do |config|
     config.vm.define "worker-#{i}" do |w|
       w.vm.box = IMAGEM
       w.vm.hostname = "worker-#{i}"
+      w.vm.network "private_network", :ip => "192.168.56.#{i+10}", :adapter => 2
+      w.vm.provision :hosts, :sync_hosts => true
       w.vm.provider "virtualbox" do |v|
         v.memory = MEMORIA
         v.cpus = CPUS

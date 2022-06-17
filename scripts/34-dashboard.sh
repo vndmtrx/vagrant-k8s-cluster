@@ -4,6 +4,8 @@ echo "##################################################################"
 echo "############### Instalação do plugin de dashboard ################"
 echo "##################################################################"
 
+IP=`ip addr show enp0s8 | grep 'inet ' | cut -d/ -f1 | awk '{ print $2}'`
+
 # Configuração do kernel para permitir o roteamento de tráfego entre interfaces
 # de rede locais
 cat <<EOF | sudo tee /etc/sysctl.d/99-local-routing.conf > /dev/null
@@ -69,8 +71,10 @@ EOF
 
 kubectl apply -f dashboard-nodeport.yml
 
+echo "Dashboard acessível no endereço https://$IP:32000"
+echo "Para gerar o token, use kubectl -n kubernetes-dashboard create token admin-user"
 
 #Não usar mais: kubectl -n kube-system get secret --template='{{.data.token}}' $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | base64 --decode ; echo
-#kubectl -n kubernetes-dashboard create token admin-user
+# kubectl -n kubernetes-dashboard create token admin-user
 #kubectl proxy --accept-hosts='.*'
 #http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
