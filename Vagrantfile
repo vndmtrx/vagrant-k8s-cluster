@@ -10,7 +10,7 @@ WORKERS = 2
 MEMORIA = 2048
 CPUS = 2
 OCI = "Containerd"
-CNI = "Calico"
+CNI = "WeaveNet"
 
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
@@ -40,23 +40,26 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
 
   # Configurações de instalação específicas do control node
-  config.vm.define "control-plane" do |cn|
+  config.vm.define "control-node" do |cn|
     cn.vm.box = IMAGEM
-    cn.vm.hostname = "control-plane"
+    cn.vm.hostname = "control-node"
     cn.vm.network "private_network", :ip => "192.168.56.10", :adapter => 2
     cn.vm.provision :hosts, :sync_hosts => true
     cn.vm.network "forwarded_port", guest: 8001, host: 8001, auto_correct: true
     cn.vm.provider "virtualbox" do |v|
       v.memory = MEMORIA
       v.cpus = CPUS
-      v.customize ["modifyvm", :id, "--natnet1", "169.254.0.0/16"]
+      v.default_nic_type = "virtio"
+      v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
     end
 
-    cn.vm.provision "shell", path: "scripts/30-control-plane.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/30-control-node.sh", privileged: false
 
     case CNI
     when "Flannel"
       cn.vm.provision "shell", path: "scripts/31-cni-flannel.sh", privileged: false
+    when "WeaveNet"
+      cn.vm.provision "shell", path: "scripts/31-cni-weave-net.sh", privileged: false
     else #Calico
       cn.vm.provision "shell", path: "scripts/31-cni-calico.sh", privileged: false
     end
@@ -77,7 +80,8 @@ Vagrant.configure("2") do |config|
       w.vm.provider "virtualbox" do |v|
         v.memory = MEMORIA
         v.cpus = CPUS
-        v.customize ["modifyvm", :id, "--natnet1", "169.254.0.0/16"]
+        v.default_nic_type = "virtio"
+        v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
       end
 
       w.vm.provision "shell", path: "scripts/40-worker-node.sh", privileged: false

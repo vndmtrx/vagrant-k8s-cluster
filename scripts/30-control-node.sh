@@ -26,12 +26,23 @@ networking:
     dnsDomain: "k8s.local"
 apiServer:
     certSANs:
+        - "$HOST"
         - "$IP"
+etcd:
+    local:
+        serverCertSANs:
+            - "$HOST"
+            - "$IP"
+        peerCertSANs:
+            - "$HOST"
+            - "$IP"
 certificatesDir: "/etc/kubernetes/pki"
 clusterName: "vagrant-kubernetes-cluster"
 EOF
 
-sudo kubeadm init --config /tmp/k8s/kubeadm-init.yml
+sudo kubeadm config images pull --config /tmp/k8s/kubeadm-init.yml --v=3
+
+sudo kubeadm init --config /tmp/k8s/kubeadm-init.yml --v=3
 
 #sudo kubeadm init --control-plane-endpoint=$HOST:6443 \
 #                  --apiserver-advertise-address=$IP \
