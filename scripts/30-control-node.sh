@@ -38,6 +38,12 @@ etcd:
             - "$IP"
 certificatesDir: "/etc/kubernetes/pki"
 clusterName: "vagrant-kubernetes-cluster"
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: "ipvs"
+ipvs:
+    strictARP: true
 EOF
 
 sudo kubeadm config images pull --config /tmp/k8s/kubeadm-init.yml --v=3

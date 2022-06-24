@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teste-loadbalancer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: teste-metallb
+  template:
+    metadata:
+      labels:
+        app: teste-metallb
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: teste-metallb
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: teste-metallb
+  type: LoadBalancer
+  externalTrafficPolicy: Local
