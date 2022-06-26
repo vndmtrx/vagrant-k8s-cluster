@@ -56,6 +56,12 @@ Por padrão, o projeto vêm com o Weave Net setado como plugin de rede.
 
 ### Plugins instalados
 
+#### MetalLB
+
+Para a instalação do plugin do MetalLB faz-se necessário configurá-lo com as opções que ele irá utilizar para fazer o loadbalancer funcionar com o cluster. Desta forma, foi criado um `ConfigMap` no arquivo `scripts/32-metallb.sh` onde foram adicionados o range de IPs que o loadbalancer poderá usar (`192.168.56.128` até `192.168.56.255`) e ao modo que ele irá atuar.
+
+No modo `layer 2` o metallb usa ARP para apontar para um IP e de lá o kube-proxy distribui para todos os serviços (dica dada no post [Configure MetalLB in layer 2 mode](https://docs.bitnami.com/kubernetes/infrastructure/metallb/administration/configure-layer2-mode/)).
+
 #### Metrics
 
 No plugin de métricas, foi feita uma alteração no manifest, para que não fosse necessário o uso de um certificado TLS de autoridade certificadora, permitindo o uso do certificado gerado pelo `kubeadm init`, através da inserção da opção `--kubelet-insecure-tls`.
@@ -71,6 +77,8 @@ Ainda sobre o dashboard, ao acessar o mesmo usando o arquivo `cluster-admin.conf
 Ainda sobre o Dashboard, inicialmente é possível acessá-lo através do comando `kubectl proxy` e a URL [http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/).
 
 No entanto, para simplificar um pouco mais o acesso, implantamos um serviço NodePort que aponta para a porta do Dashboard e nos permite acessar o mesmo através do IP dos nós, na porta 32000. Assim, não é necessário chamar o `kubectl proxy` todas as vezes, permitindo inclusive acesso de outros locais que não aqueles de onde estamos executando o `kubectl`.
+
+Adicionalmente, por questões de estudo, também foi configurado um serviço do tipo LoadBalancer que aponta para o Dashboard, assim nem sendo necessário indicar a porta do serviço, somente o IP que o serviço estiver anunciando (que você pode pegar com o comando `kubectl get service --namespace kubernetes-dashboard kubernetes-dashboard-lb`).
 
 #### Helm
 
@@ -111,6 +119,8 @@ vagrant ssh control-plane -c "kubectl -n kubernetes-dashboard create token admin
 ```
 
 Na última atualização deste projeto, adicionamos um service do tipo NodePort que permite acessarmos o dashboard sem precisar usar a URL do `kubectl proxy`. Como o service é do tipo NodePort, seu acesso pode ser feito através da URL [https://192.168.56.11:32000/](https://192.168.56.11:32000/).
+
+Ainda é possível acessar através do IP do loadbalancer criado para o dashboard, que está sendo anunciado no IP do serviço `kubernetes-dashboard-lb` (que vc pode pegar com o comando `kubectl get service --namespace kubernetes-dashboard kubernetes-dashboard-lb`).
 
 ## Exemplos de deploys e continuação dos estudos
 
