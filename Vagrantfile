@@ -82,10 +82,10 @@ Vagrant.configure("2") do |config|
     end
 
     # Instalação de vários plugins úteis para o cluster
+    cn.vm.provision "shell", path: "scripts/32-metallb.sh", privileged: false
     cn.vm.provision "shell", path: "scripts/33-metrics.sh", privileged: false
     cn.vm.provision "shell", path: "scripts/34-dashboard.sh", privileged: false
     cn.vm.provision "shell", path: "scripts/35-helm.sh", privileged: false
-    cn.vm.provision "shell", path: "scripts/36-metallb.sh", privileged: false
   end
 
   # Configurações específicas dos outros control nodes
@@ -120,7 +120,7 @@ Vagrant.configure("2") do |config|
       cn.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
 
       # Criação dos scripts de join para control e worker nodes
-      cn.vm.provision "shell", path: "scripts/32-controller-join.sh", privileged: false
+      cn.vm.provision "shell", path: "scripts/40-controller-join.sh", privileged: false
     end
   end
 
@@ -155,7 +155,7 @@ Vagrant.configure("2") do |config|
       w.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
 
       # Script de instalação do worker node e conexão no cluster
-      w.vm.provision "shell", path: "scripts/40-worker-join.sh", privileged: false
+      w.vm.provision "shell", path: "scripts/50-worker-join.sh", privileged: false
     end
   end
 end
