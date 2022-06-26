@@ -92,7 +92,7 @@ EOF
 kubectl apply -f dashboard-loadbalancer.yml
 
 echo "Dashboard acessível no endereço https://$IP:32000"
-echo "Dashboard também estará acessível de um dos IPs do MetalLB"
+echo "Dashboard também estará acessível no endereço do serviço 'kubernetes-dashboard-lb' (geralmente https://192.168.56.128)"
 echo "Para gerar o token, use kubectl -n kubernetes-dashboard create token admin-user"
 
 #Não usar mais: kubectl -n kube-system get secret --template='{{.data.token}}' $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | base64 --decode ; echo
