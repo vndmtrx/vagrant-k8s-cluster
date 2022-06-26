@@ -57,7 +57,7 @@ apiVersion: v1
 metadata:
   labels:
     k8s-app: kubernetes-dashboard
-  name: kubernetes-dashboard
+  name: kubernetes-dashboard-np
   namespace: kubernetes-dashboard
 spec:
   ports:
@@ -71,7 +71,28 @@ EOF
 
 kubectl apply -f dashboard-nodeport.yml
 
+cat <<EOF | tee dashboard-loadbalancer.yml > /dev/null
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard-lb
+  namespace: kubernetes-dashboard
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 8443
+  selector:
+    k8s-app: kubernetes-dashboard
+  type: LoadBalancer
+EOF
+
+kubectl apply -f dashboard-loadbalancer.yml
+
 echo "Dashboard acessível no endereço https://$IP:32000"
+echo "Dashboard também estará acessível de um dos IPs do MetalLB"
 echo "Para gerar o token, use kubectl -n kubernetes-dashboard create token admin-user"
 
 #Não usar mais: kubectl -n kube-system get secret --template='{{.data.token}}' $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | base64 --decode ; echo
