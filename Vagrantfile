@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
   end
 
   # Configurações de instalação específicas do control node
-  config.vm.define "cn-1" do |cn|
+  config.vm.define "cn-1", primary: true do |cn|
     cn.vm.box = IMAGEM
     cn.vm.hostname = "control-node-1.k8s.cluster"
     cn.vm.network "private_network", :ip => "192.168.56.11", :adapter => 2
