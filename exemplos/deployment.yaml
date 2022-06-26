@@ -63,6 +63,14 @@ spec:
               date >> /html/index.html ;
               sleep 1 ;
             done
+      initContainers:
+      - name: bash-init-container
+        image: bash
+        command: ["/usr/local/bin/bash", "-c"]
+        args:
+          - echo 'Sleeeping!' ;
+            sleep 60 ;
+            echo 'Here we goooooooo!' ;
 ---
 apiVersion: v1
 kind: Service
