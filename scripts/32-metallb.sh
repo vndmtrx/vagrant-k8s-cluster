@@ -24,3 +24,6 @@ EOF
 kubectl apply -f metallb-config.yml
 
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+
+echo "Aguardando 30 segundos para o metallb inicializar."
+sleep 30s

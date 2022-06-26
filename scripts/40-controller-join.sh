@@ -25,9 +25,3 @@ echo "complete -F __start_kubectl k" >> ~/.bashrc
 # Permitindo o agendamento de pods no control-plane
 kubectl taint nodes --all node-role.kubernetes.io/master-
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
-
-#kubectl get pods -n kube-system -o wide
-#kubectl get nodes -o wide
-
-echo "Aguardando 30 segundos para o control node inicializar."
-sleep 30s

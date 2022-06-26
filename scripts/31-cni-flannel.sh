@@ -22,5 +22,5 @@ sed -i 's/10.244.0.0\/16/172.17.0.0\/16/g' kube-flannel.yaml
 kubectl apply -f kube-flannel.yaml
 #Qdo fizer para Flannel, atentar a isso aqui: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/troubleshooting-kubeadm/#default-nic-when-using-flannel-as-the-pod-network-in-vagrant
 
-#kubectl get daemonsets --all-namespaces -o wide
-#kubectl logs -l app=flannel -n kube-system -f
+echo "Aguardando 30 segundos para o CNI inicializar."
+sleep 30s

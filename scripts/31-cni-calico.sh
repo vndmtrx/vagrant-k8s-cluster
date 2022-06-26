@@ -19,3 +19,6 @@ sed -i '/apiVersion: policy\/v1beta1/s/v1beta1/v1/' calico.yaml
 #sed -i 's/value: "192.168.0.0\/16"/value: "172.17.0.0\/16"/g' calico.yaml
 
 kubectl apply -f calico.yaml
+
+echo "Aguardando 30 segundos para o CNI inicializar."
+sleep 30s
