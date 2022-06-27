@@ -4,7 +4,7 @@ echo "####################################################################"
 echo "#################### Instalação do Control Node ####################"
 echo "####################################################################"
 
-IP=`ip addr show enp0s8 | grep 'inet ' | cut -d/ -f1 | awk '{ print $2}'`
+IP=`ip addr show enp0s8 | grep 'inet ' | cut -d/ -f1 | awk '{ print $2 }'`
 HOST=`hostname -s`
 
 # Limpeza da pasta temporária do projeto
@@ -67,12 +67,14 @@ sleep 60s
 sudo cp -R /etc/kubernetes/pki /tmp/k8s/
 
 # Criando o comando de join dos worker nodes
-echo "$(sudo kubeadm token create --print-join-command --config /tmp/k8s/kubeadm-init.yml) --v=3" > /tmp/k8s/worker-node-join.sh
+echo "IP=\$(ip addr show enp0s8 | grep 'inet ' | cut -d/ -f1 | awk '{ print \$2 }')" > /tmp/k8s/worker-node-join.sh
+echo "$(sudo kubeadm token create --print-join-command --config /tmp/k8s/kubeadm-init.yml) --v=3 --apiserver-advertise-address \$IP" >> /tmp/k8s/worker-node-join.sh
 
 # Criando o comando de join dos control nodes
 KEY=$(openssl rand -hex 32)
 sudo kubeadm init phase upload-certs --upload-certs --certificate-key $KEY
-echo "$(sudo kubeadm token create --print-join-command --config /tmp/k8s/kubeadm-init.yml) --control-plane --certificate-key $KEY --v=3" > /tmp/k8s/control-node-join.sh
+echo "IP=\$(ip addr show enp0s8 | grep 'inet ' | cut -d/ -f1 | awk '{ print \$2 }')" > /tmp/k8s/control-node-join.sh
+echo "$(sudo kubeadm token create --print-join-command --config /tmp/k8s/kubeadm-init.yml) --control-plane --certificate-key $KEY --v=3 --apiserver-advertise-address \$IP" >> /tmp/k8s/control-node-join.sh
 
 sudo cp -f /etc/kubernetes/admin.conf /tmp/k8s/cluster-admin.conf
 

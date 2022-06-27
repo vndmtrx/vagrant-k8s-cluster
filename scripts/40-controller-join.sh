@@ -9,10 +9,10 @@ HOST=`hostname -s`
 
 chmod 0755 /tmp/k8s/control-node-join.sh
 
-# Hack para fazer o comando `kubeadm join` funcionar usando a interface de rede host-only
-sudo ip route add default via 192.168.56.1
 sudo /tmp/k8s/control-node-join.sh
-sudo ip route del default via 192.168.56.1
+
+echo "Aguardando 30 segundos para o control node inicializar."
+sleep 30s
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
