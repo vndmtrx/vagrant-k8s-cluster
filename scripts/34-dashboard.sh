@@ -91,6 +91,8 @@ EOF
 
 kubectl apply -f dashboard-loadbalancer.yml
 
+sleep 10s
+
 echo "Dashboard acessível no endereço https://$IP:32000"
 echo "Dashboard também estará acessível no endereço https://$(kubectl get services --namespace kubernetes-dashboard kubernetes-dashboard-lb --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
 echo "Para gerar o token, use kubectl -n kubernetes-dashboard create token admin-user"
