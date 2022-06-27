@@ -90,7 +90,7 @@ Vagrant.configure("2") do |config|
 
   # Configurações específicas dos outros control nodes
   (2..CONTROLLERS+1).each do |i|
-    config.vm.define "cn-#{i}" do |cn|
+    config.vm.define "cn-#{i}", autostart: false do |cn|
       cn.vm.box = IMAGEM
       cn.vm.hostname = "control-node-#{i}.k8s.cluster"
       cn.vm.network "private_network", :ip => "192.168.56.#{i+10}", :adapter => 2
