@@ -101,3 +101,5 @@ echo "Para gerar o token, use kubectl -n kubernetes-dashboard create token admin
 # kubectl -n kubernetes-dashboard create token admin-user
 #kubectl proxy --accept-hosts='.*'
 #http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+exit 0

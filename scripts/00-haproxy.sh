@@ -37,3 +37,5 @@ backend kube-apiserver
 EOF
 
 systemctl restart haproxy
+
+exit 0

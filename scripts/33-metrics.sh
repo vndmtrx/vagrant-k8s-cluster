@@ -26,3 +26,5 @@ kubectl patch deployment metrics-server -n kube-system --patch-file metrics-patc
 
 #kubectl top pods -n kube-system
 #kubectl top nodes
+
+exit 0

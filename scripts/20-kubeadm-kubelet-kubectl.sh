@@ -24,3 +24,5 @@ apt-get install kubelet kubeadm kubectl -yq
 
 # Travamento da versão do Kubeadm, Kubelet e Kubectl
 apt-mark hold kubelet kubeadm kubectl
+
+exit 0

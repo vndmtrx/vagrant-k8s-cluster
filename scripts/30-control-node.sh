@@ -85,3 +85,5 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 echo "alias k='kubectl'" >> ~/.bashrc
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 echo "complete -F __start_kubectl k" >> ~/.bashrc
+
+exit 0

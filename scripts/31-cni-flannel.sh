@@ -24,3 +24,5 @@ kubectl apply -f kube-flannel.yaml
 
 echo "Aguardando 30 segundos para o CNI inicializar."
 sleep 30s
+
+exit 0

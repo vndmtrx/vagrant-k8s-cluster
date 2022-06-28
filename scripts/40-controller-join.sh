@@ -25,3 +25,5 @@ echo "complete -F __start_kubectl k" >> ~/.bashrc
 # Permitindo o agendamento de pods no control-plane
 kubectl taint nodes --all node-role.kubernetes.io/master-
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+
+exit 0

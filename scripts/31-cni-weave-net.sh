@@ -9,3 +9,5 @@ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl versio
 
 echo "Aguardando 30 segundos para o CNI inicializar."
 sleep 30s
+
+exit 0

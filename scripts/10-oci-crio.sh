@@ -48,3 +48,5 @@ apt-get install cri-o cri-o-runc -yq
 sudo systemctl daemon-reload
 sudo systemctl enable crio
 sudo systemctl start crio
+
+exit 0

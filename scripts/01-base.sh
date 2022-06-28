@@ -20,3 +20,5 @@ cd /usr/local/bin/ && (curl -s "https://raw.githubusercontent.com/kubernetes-sig
 
 sed -i 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="systemd.unified_cgroup_hierarchy=0"/g' /etc/default/grub
 update-grub2
+
+exit 0

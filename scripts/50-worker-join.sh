@@ -12,3 +12,5 @@ chmod 0755 /tmp/k8s/worker-node-join.sh
 sudo /tmp/k8s/worker-node-join.sh
 
 kubectl label node $HOST node-role.kubernetes.io/worker=worker --kubeconfig /tmp/k8s/cluster-admin.conf
+
+exit 0

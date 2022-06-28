@@ -27,3 +27,5 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manif
 
 echo "Aguardando 30 segundos para o metallb inicializar."
 sleep 30s
+
+exit 0
