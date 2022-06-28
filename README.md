@@ -34,6 +34,8 @@ Uma coisa para qual esse repositório foi pensado foi a de ser possível customi
 
 7. Ainda sobre a imagem do Ubuntu, devido ao fato de a imagem não vir com o agendamento de CGroups habilitada no kernel, foi necessário fazer a customização da string de inicialização do kernel no Grub. Devido a este fato, é necessária a instalação do plugin vagrant-reload para que a instância seja reinicializada após a alteração do grub da instância. A instalação pode ser feita através do comando `vagrant plugin install vagrant-reload`.
 
+8. Como o cluster Kubernetes depende muito dos nomes dos hosts para orquestrar as ações dentro do cluster (principalmente em relação à geração dos certificados e do CA), é necessário fazer um gerenciamento do arquivo de hosts das máquinas. Anteriormente, isso era feito usando um arquivo compartilhado e um script cron, mas é possível simplificar isso usando o plugin vagrant-hosts. A instalação pode ser feita com o comando `vagrant plugin install vagrant-hosts`.
+
 ### Containerd e/ou CRI-O
 
 Para a instalação do Containerd, são necessárias algumas etapas já que o Docker faz muita coisa "magicamente" por nós. Aqui é onde as coisas começam a ficar um pouco nebulosas. Apesar de os desenvolvedores do Kubernetes falarem que as coisas funcionam sem nenhum ajuste maior, isso só acontece quando você usa do Docker como backend de conteineres. O Docker faz um monte de coisas pra por trás dos panos que, quando você migra para o Containerd, você precisa fazer essas configurações de forma manual. As instruções de instalação do Containerd estão detalhadas nos comentários do arquivo `scripts/10-oci-containerd.sh`.
@@ -83,6 +85,17 @@ Adicionalmente, por questões de estudo, também foi configurado um serviço do 
 #### Helm
 
 Foi instalado o executável do Helm na máquina, para a instalação de charts que porventura possam ser usados durante as experimentações e estudos com o Kubernetes. O arquivo é o `scripts/35-helm.sh`.
+
+# Instalação das dependências do Vagrant
+
+Para executar o projeto, algumas coisas são necessárias. Primeiramente, é necessário instalar o VirtualBox e o Vagrant. Após a instalação destes, é necessário instalar os plugins para o funcionamento do projeto:
+
+```bash
+vagrant plugin install vagrant-reload
+vagrant plugin install vagrant-hosts
+```
+
+Com a instalação destes artefatos, é possível fazer a execução do projeto.
 
 # Executando o projeto
 
