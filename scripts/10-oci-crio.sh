@@ -7,8 +7,8 @@ echo "##############################################################"
 # Configuração para mitigar erro que aparece durante o processo do terminal do Vagrant
 export DEBIAN_FRONTEND=noninteractive
 
-export OS_VERSION=xUbuntu_20.04
-export CRIO_VERSION=1.23
+export OS_VERSION=xUbuntu_22.04
+export CRIO_VERSION=1.24
 
 # Configuração de carregamento dos módulos `overlay` e `br_netfilter`
 cat <<EOF | tee /etc/modules-load.d/containerd.conf > /dev/null
