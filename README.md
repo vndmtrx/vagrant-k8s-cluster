@@ -46,15 +46,13 @@ A instalação do Docker foi removida pois não conseguimos fazer a mesma funcio
 
 Por padrão o projeto vêm com o Containerd configurado como engine de conteineres padrão.
 
-### Weave Net, Calico e/ou Flannel
+### Calico e/ou Flannel
 
-Para a configuração do plugin de rede que o Kubernetes deixamos disponível a opão de usar o Calico pela simplicidade de configuração, já que na versão atual ele importa as configurações de pods e serviços direto do Kubernetes, não sendo necessário nenhum ajuste na configuração. No entanto, caso seja necessário usar uma configuração personalizada (especificamente de rede), eu deixei comentado alterações no arquivo `calico.yaml` que é baixado para a implantação da rede. As alterações são no pool de IPs que o Calico pode usar. Como disse, o Calico atualmente é inteligente o suficiente para encontrar essas informações, considerando que elas tenham sido passadas para o comando `kubeadm init` pelos parâmetros `--service-cidr` e `--pod-network-cidr`. Em tempo, um warning foi removido da instalação do Calico, devido a versão da API que foi trocada de `apiVersion: policy/v1beta1` para `apiVersion: policy/v1`, segundo a [documentação](https://kubernetes.io/docs/tasks/run-application/configure-pdb/). Adicionalmente, usando o Calico, o `MetalLB` não irá funcionar pois não foi feita nenhuma configuração para fazer os dois conversarem (pois ambos usam BGP para fazer o roteamento do tráfego).
+Para a configuração do plugin de rede que o Kubernetes precisa, deixamos disponível a opção de usar o Calico pela simplicidade de configuração, já que na versão atual ele importa as configurações de pods e serviços direto do Kubernetes, não sendo necessário nenhum ajuste na configuração. No entanto, caso seja necessário usar uma configuração personalizada (especificamente de rede), eu deixei comentado alterações no arquivo `calico.yaml` que é baixado para a implantação da rede. As alterações são no pool de IPs que o Calico pode usar. Como disse, o Calico atualmente é inteligente o suficiente para encontrar essas informações, considerando que elas tenham sido passadas para o comando `kubeadm init` pelos parâmetros `--service-cidr` e `--pod-network-cidr`. Em tempo, um warning foi removido da instalação do Calico, devido a versão da API que foi trocada de `apiVersion: policy/v1beta1` para `apiVersion: policy/v1`, segundo a [documentação](https://kubernetes.io/docs/tasks/run-application/configure-pdb/). Adicionalmente, usando o Calico, o `MetalLB` não irá funcionar pois não foi feita nenhuma configuração para fazer os dois conversarem (pois ambos usam BGP para fazer o roteamento do tráfego).
 
 Para a configuração do plugin de rede do Flannel, foram feitas algumas alterações no arquivo de instalação do CNI. A primeira delas é referente à interface de rede que o Flannel irá usar para construir o overlay (linha [13](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/31-cni-flannel.sh#L13)). Adicionalmente, foi feita a alteração da rede de pods para uso do Flannel. O Flannel por padrão vêm com a rede `10.244.0.0/16` configurada para o parâmetro `FLANNEL_NETWORK`, que pode ser visto no arquivo `/run/flannel/subnet.env`. Para manter o mesmo padrão de rede usado no projeto, mudamos o valor no ConfigMap (linha [20](https://gitlab.com/devops-in-a-jar/vagrant-k8s-cluster/-/blob/main/scripts/31-cni-flannel.sh#L20)) para o valor que está definido para a nossa rede de pods, conforme explicado no post [Kubernetes: Flannel networking](https://blog.laputa.io/kubernetes-flannel-networking-6a1cb1f8ec7c).
 
-O plugin CNI atualmente em uso é o Weave Net, que é o mais simples de configurar, e que funciona perfeitamente com o `MetalLB`.
-
-Por padrão, o projeto vêm com o Weave Net setado como plugin de rede.
+Por padrão, o projeto vêm com o Flannel setado como plugin de rede.
 
 ### Plugins instalados
 
@@ -63,6 +61,8 @@ Por padrão, o projeto vêm com o Weave Net setado como plugin de rede.
 Para a instalação do plugin do MetalLB faz-se necessário configurá-lo com as opções que ele irá utilizar para fazer o loadbalancer funcionar com o cluster. Desta forma, foi criado um `ConfigMap` no arquivo `scripts/32-metallb.sh` onde foram adicionados o range de IPs que o loadbalancer poderá usar (`192.168.56.128` até `192.168.56.255`) e ao modo que ele irá atuar.
 
 No modo `layer 2` o metallb usa ARP para apontar para um IP e de lá o kube-proxy distribui para todos os serviços (dica dada no post [Configure MetalLB in layer 2 mode](https://docs.bitnami.com/kubernetes/infrastructure/metallb/administration/configure-layer2-mode/)).
+
+Importante lembrar, se estiver usando o Calico como CNI, o MetalLB não irá funcionar na configuração atual.
 
 #### Metrics
 

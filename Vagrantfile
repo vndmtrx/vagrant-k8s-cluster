@@ -10,8 +10,8 @@ WORKERS = 2
 CONTROLLERS = 2
 MEMORIA = 2048
 CPUS = 2
-OCI = "Containerd"
-CNI = "WeaveNet"
+OCI = "CRI-O"
+CNI = "Flannel"
 
 Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
@@ -75,8 +75,6 @@ Vagrant.configure("2") do |config|
     case CNI
     when "Flannel"
       cn.vm.provision "shell", path: "scripts/31-cni-flannel.sh", privileged: false
-    when "WeaveNet"
-      cn.vm.provision "shell", path: "scripts/31-cni-weave-net.sh", privileged: false
     else #Calico
       cn.vm.provision "shell", path: "scripts/31-cni-calico.sh", privileged: false
     end
