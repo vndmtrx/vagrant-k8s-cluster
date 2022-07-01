@@ -1,0 +1,38 @@
+# https://kubernetes.io/docs/concepts/workloads/pods/
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-05-readiness
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-readiness
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 30
+      periodSeconds: 10
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-readiness
+  name: service-05-lb-pod-readiness
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    exemplo: pod-readiness
+  type: LoadBalancer

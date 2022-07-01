@@ -1,0 +1,40 @@
+# https://kubernetes.io/docs/concepts/workloads/pods/
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-02-multiplospods
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-multiplospods
+spec:
+  containers:
+  - name: nginx-http
+    image: nginx
+    ports:
+    - containerPort: 80
+  - name: nginx-proxy
+    image: bitnami/nginx
+    ports:
+    - containerPort: 8080
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-multiplospods
+  name: service-02-lb-pod-multiplospods
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: proxy
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    exemplo: pod-multiplospods
+  type: LoadBalancer

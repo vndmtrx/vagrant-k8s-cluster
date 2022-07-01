@@ -1,0 +1,33 @@
+# https://kubernetes.io/docs/concepts/workloads/pods/
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-01-simples
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-simples
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-simples
+  name: service-01-np-pod-simples
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 32100
+  selector:
+    exemplo: pod-simples
+  type: NodePort

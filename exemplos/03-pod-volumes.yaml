@@ -1,0 +1,52 @@
+# https://kubernetes.io/docs/concepts/workloads/pods/
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-03-volumes
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-volumes
+spec:
+  volumes:
+  - name: html
+    emptyDir: {}
+  containers:
+  - name: nginx-container
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html
+  - name: bash-container
+    image: bash
+    volumeMounts:
+    - name: html
+      mountPath: /html
+    command: 
+      - /usr/local/bin/bash
+      - "-c"
+    args:
+      - | 
+        while true; do
+          echo "Hora atual: $(date)" > /html/index.html ;
+          sleep 1 ;
+        done
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-volumes
+  name: service-03-lb-pod-volumes
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    exemplo: pod-volumes
+  type: LoadBalancer

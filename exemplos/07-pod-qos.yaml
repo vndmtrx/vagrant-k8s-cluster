@@ -1,0 +1,48 @@
+# https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-07-qos-guaranteed
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-qos
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        memory: "200Mi"
+        cpu: "700m"
+      limits:
+        memory: "200Mi"
+        cpu: "700m"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-07-qos-burstable
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-qos
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        memory: "100Mi"
+      limits:
+        memory: "200Mi"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-07-qos-besteffort
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-qos
+spec:
+  containers:
+  - name: nginx
+    image: nginx

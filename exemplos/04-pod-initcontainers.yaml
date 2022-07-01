@@ -1,0 +1,50 @@
+# https://kubernetes.io/docs/concepts/workloads/pods/
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-04-initcontainers
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-initcontainers
+spec:
+  volumes:
+  - name: html
+    emptyDir: {}
+  containers:
+  - name: nginx-container
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html
+  initContainers:
+  - name: bash-container
+    image: bash
+    volumeMounts:
+    - name: html
+      mountPath: /html
+    command: 
+      - /usr/local/bin/bash
+      - "-c"
+    args:
+    - | 
+      echo "Data de start: $(date)" > /html/index.html ;
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pod-initcontainers
+  name: service-04-lb-pod-initcontainers
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    exemplo: pod-initcontainers
+  type: LoadBalancer
