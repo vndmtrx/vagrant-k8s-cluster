@@ -4,8 +4,8 @@ echo "##################################################################"
 echo "#################### Instalação do Containerd ####################"
 echo "##################################################################"
 
-# Configuração para mitigar erro que aparece durante o processo do terminal do Vagrant
-export DEBIAN_FRONTEND=noninteractive
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
 # Configuração de carregamento dos módulos `overlay` e `br_netfilter`
 cat <<EOF | tee /etc/modules-load.d/containerd.conf > /dev/null
@@ -32,7 +32,7 @@ systemctl restart systemd-sysctl
 
 # Instalação das dependências do Containerd (utils, certificado, repositório)
 apt-get install -yq curl gnupg apt-transport-https software-properties-common ca-certificates lsb-release bash-completion
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+curl -fsSL $CONTAINERD_KR | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Instalação do runtime do Containerd

@@ -4,8 +4,8 @@ echo "#####################################################################"
 echo "############### Geração do comando de Join dos Nodes ################"
 echo "#####################################################################"
 
-IP=`ip addr show enp0s8 | grep 'inet ' | cut -d/ -f1 | awk '{ print $2}'`
-HOST=`hostname -s`
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
 chmod 0755 /tmp/k8s/control-node-join.sh
 

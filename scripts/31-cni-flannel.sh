@@ -4,9 +4,12 @@ echo "######################################################"
 echo "############### Instalação do Flannel ################"
 echo "######################################################"
 
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
+
 #kubectl patch node $HOST -p '{"spec":{"podCIDR":"172.17.0.0/16"}}'
 
-curl -fsSLo kube-flannel.yaml https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+curl -fsSLo kube-flannel.yaml $FLANNEL_LINK
 
 # Internamente o Flannel está tentando pegar a primeira interface de rede, ligada
 # ao NAT do vagrant, e portanto não acessível externamente.

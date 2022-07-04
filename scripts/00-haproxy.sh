@@ -4,8 +4,8 @@ echo "#######################################################"
 echo "####################### HAProxy #######################"
 echo "#######################################################"
 
-# Configuração para mitigar erro que aparece durante o processo do terminal do Vagrant
-export DEBIAN_FRONTEND=noninteractive
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
 apt-get install -yq jq haproxy
 

@@ -4,8 +4,8 @@ echo "#########################################################################"
 echo "############### Instalação do Kubelet, Kubeadm e Kubectl ################"
 echo "#########################################################################"
 
-# Configuração para mitigar erro que aparece durante o processo do terminal do Vagrant
-export DEBIAN_FRONTEND=noninteractive
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
 # Desativação do swap conforme orientação do kubeadm (https://github.com/kubernetes/kubeadm/issues/610)
 swapoff -a

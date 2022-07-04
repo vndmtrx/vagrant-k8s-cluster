@@ -4,11 +4,8 @@ echo "##############################################################"
 echo "#################### Instalação do CRI-O ####################"
 echo "##############################################################"
 
-# Configuração para mitigar erro que aparece durante o processo do terminal do Vagrant
-export DEBIAN_FRONTEND=noninteractive
-
-export OS_VERSION=xUbuntu_22.04
-export CRIO_VERSION=1.24
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
 # Configuração de carregamento dos módulos `overlay` e `br_netfilter`
 cat <<EOF | tee /etc/modules-load.d/containerd.conf > /dev/null
@@ -35,10 +32,10 @@ systemctl restart systemd-sysctl
 
 # Instalação das dependências do CRI-O (utils, certificado, repositório)
 apt-get install -yq curl gnupg apt-transport-https software-properties-common ca-certificates lsb-release bash-completion
-curl -fsSL https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS_VERSION/Release.key | sudo gpg --dearmor -o /usr/share/keyrings/libcontainers-archive-keyring.gpg
-curl -fsSL https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIO_VERSION/$OS_VERSION/Release.key | sudo gpg --dearmor -o /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS_VERSION/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
-echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$CRIO_VERSION/$OS_VERSION/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$CRIO_VERSION.list
+curl -fsSL $CRIO_LINK_KR1 | sudo gpg --dearmor -o /usr/share/keyrings/libcontainers-archive-keyring.gpg
+curl -fsSL $CRIO_LINK_KR2 | sudo gpg --dearmor -o /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] $CRIO_LINK_REPO1 /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] $CRIO_LINK_REPO2 /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$CRIO_VERSION.list
 
 # Instalação do runtime do CRI-O
 apt-get update -yq

@@ -4,9 +4,12 @@ echo "#######################################################################"
 echo "############### Instalação gerenciador de pacotes Helm ################"
 echo "#######################################################################"
 
-curl -fsSLo helm.tar.gz https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
-tar -xvzf helm.tar.gz
-sudo cp -Rv linux-amd64/helm /usr/local/bin/helm
+curl -fsSL https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update -yq
+sudo apt-get install -yq helm
 
 exit 0

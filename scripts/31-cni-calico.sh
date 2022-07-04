@@ -4,11 +4,10 @@ echo "#####################################################"
 echo "############### Instalação do Calico ################"
 echo "#####################################################"
 
-curl -fsSLo calico.yaml https://docs.projectcalico.org/manifests/calico.yaml
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
-# Para remover o warning do `PodDisruptionBudget` durante a instalação do CNI, pois
-# este foi movido da versão `v1beta1` para a versão `v1` da API.
-sed -i '/apiVersion: policy\/v1beta1/s/v1beta1/v1/' calico.yaml
+curl -fsSLo calico.yaml $CALICO_LINK
 
 # Se o Calico não funcionar adequadamente com o range de IPs selecionado para os
 # pods é necessário editar o arquivo de configuração do Calico, descomentar a opção

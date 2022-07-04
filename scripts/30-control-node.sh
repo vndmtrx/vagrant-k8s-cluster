@@ -4,8 +4,8 @@ echo "####################################################################"
 echo "#################### Instalação do Control Node ####################"
 echo "####################################################################"
 
-IP=`ip addr show enp0s8 | grep 'inet ' | cut -d/ -f1 | awk '{ print $2 }'`
-HOST=`hostname -s`
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
 # Limpeza da pasta temporária do projeto
 find /tmp/k8s/ -mindepth 1 ! -name .gitkeep -delete

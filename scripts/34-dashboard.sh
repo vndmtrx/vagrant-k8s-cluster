@@ -4,7 +4,8 @@ echo "##################################################################"
 echo "############### Instalação do plugin de dashboard ################"
 echo "##################################################################"
 
-IP=`ip addr show enp0s8 | grep 'inet ' | cut -d/ -f1 | awk '{ print $2}'`
+# Importação das variáveis comuns usadas por todo o projeto
+source /vagrant/scripts/00-envvars.sh
 
 # Configuração do kernel para permitir o roteamento de tráfego entre interfaces
 # de rede locais
@@ -22,7 +23,7 @@ sudo systemctl restart systemd-sysctl
 # o acesso ao dashboard usando a forwarded port configurada no `Vagrantfile`
 sudo iptables -t nat -I PREROUTING -p tcp -d 169.254.0.15/32 --dport 8001 -j DNAT --to-destination 127.0.0.1:8001
 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.0/aio/deploy/recommended.yaml
+kubectl apply -f $DASHBOARD_DEPLOYMENT
 
 cat <<EOF | tee dashboard-adminuser.yml > /dev/null
 apiVersion: v1
