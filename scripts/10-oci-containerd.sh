@@ -32,7 +32,7 @@ systemctl restart systemd-sysctl
 
 # Instalação das dependências do Containerd (utils, certificado, repositório)
 apt-get install -yq curl gnupg apt-transport-https software-properties-common ca-certificates lsb-release bash-completion
-curl -fsSL $CONTAINERD_KR | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Instalação do runtime do Containerd
