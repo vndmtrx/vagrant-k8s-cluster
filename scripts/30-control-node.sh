@@ -86,4 +86,6 @@ echo "alias k='kubectl'" >> ~/.bashrc
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 echo "complete -F __start_kubectl k" >> ~/.bashrc
 
+echo "watch -n 1 kubectl get pods,services,nodes -o wide -A" >> ~/.bash_history
+
 exit 0
