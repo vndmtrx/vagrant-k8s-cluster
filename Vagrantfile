@@ -10,7 +10,7 @@ WORKERS = 2
 CONTROLLERS = 2
 MEMORIA = 2048
 CPUS = 2
-OCI = "CRI-O"
+OCI = "Containerd"
 CNI = "Flannel"
 
 Vagrant.configure("2") do |config|
