@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-07-qos-guaranteed
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-qos
@@ -22,6 +23,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-07-qos-burstable
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-qos
@@ -39,6 +41,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-07-qos-besteffort
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-qos

@@ -1,0 +1,8 @@
+# https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: exemplos
+  labels:
+    name: exemplos
+    exemplo: namespaces

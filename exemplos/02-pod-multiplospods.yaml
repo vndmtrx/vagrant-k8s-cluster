@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-02-multiplospods
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-multiplospods
@@ -21,10 +22,11 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
+  name: service-02-lb-pod-multiplospods
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-multiplospods
-  name: service-02-lb-pod-multiplospods
 spec:
   ports:
     - name: http

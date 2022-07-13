@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-06-limit-mem
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-limits
@@ -22,6 +23,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-06-limit-mem-acima
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-limits
@@ -43,6 +45,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-06-limit-cpu
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-limits

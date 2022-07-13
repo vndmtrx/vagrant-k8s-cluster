@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-03-volumes
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-volumes
@@ -37,10 +38,11 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
+  name: service-03-lb-pod-volumes
+  namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
     exemplo: pod-volumes
-  name: service-03-lb-pod-volumes
 spec:
   ports:
     - name: http
