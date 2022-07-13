@@ -92,11 +92,15 @@ EOF
 
 kubectl apply -f dashboard-loadbalancer.yml
 
+kubectl config set-credentials kubernetes-admin --token="$(openssl rand -hex 64)"
+kubectl config view --raw > /tmp/k8s/kubeconfig-dashboard.yaml
+
 sleep 10s
 
 echo "Dashboard acessível no endereço https://$IP:32000"
 echo "Dashboard também estará acessível no endereço https://$(kubectl get services --namespace kubernetes-dashboard kubernetes-dashboard-lb --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
 echo "Para gerar o token, use kubectl -n kubernetes-dashboard create token admin-user"
+echo "Também é possível usar o arquivo kubeconfig-dashboard.yaml presente na subpasta data/ dentro da pasta do Vagrant."
 
 #Não usar mais: kubectl -n kube-system get secret --template='{{.data.token}}' $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') | base64 --decode ; echo
 # kubectl -n kubernetes-dashboard create token admin-user
