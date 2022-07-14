@@ -23,6 +23,7 @@ Vagrant.configure("2") do |config|
   # Configuração da pasta de montagem dos arquivos gerados pelo control node
   config.vm.synced_folder "./data", "/tmp/k8s", create: true
 
+  # API Server LoadBalancer
   config.vm.define "haproxy" do |cn|
     cn.vm.box = IMAGEM
     cn.vm.hostname = "lb.k8s.cluster"
@@ -35,9 +36,9 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
     end
 
-    cn.vm.provision "shell", path: "scripts/00-haproxy.sh"
+    cn.vm.provision "shell", path: "scripts/101-haproxy.sh"
   end
-
+  
   # Configurações de instalação específicas do control node
   config.vm.define "cn-1", primary: true do |cn|
     cn.vm.box = IMAGEM
@@ -52,38 +53,38 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
     end
 
-    cn.vm.provision "shell", path: "scripts/01-base.sh"
+    cn.vm.provision "shell", path: "scripts/201-base.sh"
     cn.vm.provision :reload
 
     # Seletor do script de instalação da engine de contêiner
     case OCI
     when "Containerd"
-      cn.vm.provision "shell", path: "scripts/10-oci-containerd.sh"
+      cn.vm.provision "shell", path: "scripts/210-oci-containerd.sh"
     when "CRI-O"
-      cn.vm.provision "shell", path: "scripts/10-oci-crio.sh"
+      cn.vm.provision "shell", path: "scripts/210-oci-crio.sh"
     else #Docker
-      config.vm.provision "shell", path: "scripts/10-oci-docker.sh"
+      config.vm.provision "shell", path: "scripts/210-oci-docker.sh"
     end
 
     # Script de instalação das ferramentas básicas do Kubernetes
-    cn.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
+    cn.vm.provision "shell", path: "scripts/220-kubeadm-kubelet-kubectl.sh"
 
     # Script de criação do primeiro control node
-    cn.vm.provision "shell", path: "scripts/30-control-node.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/230-control-node.sh", privileged: false
 
     # Seletor do script de instalação do plugin de CNI
     case CNI
     when "Flannel"
-      cn.vm.provision "shell", path: "scripts/31-cni-flannel.sh", privileged: false
+      cn.vm.provision "shell", path: "scripts/231-cni-flannel.sh", privileged: false
     else #Calico
-      cn.vm.provision "shell", path: "scripts/31-cni-calico.sh", privileged: false
+      cn.vm.provision "shell", path: "scripts/231-cni-calico.sh", privileged: false
     end
 
     # Instalação de vários plugins úteis para o cluster
-    cn.vm.provision "shell", path: "scripts/32-metallb.sh", privileged: false
-    cn.vm.provision "shell", path: "scripts/33-metrics.sh", privileged: false
-    cn.vm.provision "shell", path: "scripts/34-dashboard.sh", privileged: false
-    cn.vm.provision "shell", path: "scripts/35-helm.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/232-metallb.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/233-metrics.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/234-helm.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/235-dashboard.sh", privileged: false
   end
 
   # Configurações específicas dos outros control nodes
@@ -101,24 +102,24 @@ Vagrant.configure("2") do |config|
         v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
       end
 
-      cn.vm.provision "shell", path: "scripts/01-base.sh"
+      cn.vm.provision "shell", path: "scripts/201-base.sh"
       cn.vm.provision :reload
 
       # Seletor do script de instalação da engine de contêiner
       case OCI
       when "Containerd"
-        cn.vm.provision "shell", path: "scripts/10-oci-containerd.sh"
+        cn.vm.provision "shell", path: "scripts/210-oci-containerd.sh"
       when "CRI-O"
-        cn.vm.provision "shell", path: "scripts/10-oci-crio.sh"
+        cn.vm.provision "shell", path: "scripts/210-oci-crio.sh"
       else #Docker
-        config.vm.provision "shell", path: "scripts/10-oci-docker.sh"
+        config.vm.provision "shell", path: "scripts/210-oci-docker.sh"
       end
 
       # Script de instalação das ferramentas básicas do Kubernetes
-      cn.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
+      cn.vm.provision "shell", path: "scripts/220-kubeadm-kubelet-kubectl.sh"
 
       # Criação dos scripts de join para control e worker nodes
-      cn.vm.provision "shell", path: "scripts/40-controller-join.sh", privileged: false
+      cn.vm.provision "shell", path: "scripts/240-controller-join.sh", privileged: false
     end
   end
 
@@ -136,24 +137,24 @@ Vagrant.configure("2") do |config|
         v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
       end
 
-      w.vm.provision "shell", path: "scripts/01-base.sh"
+      w.vm.provision "shell", path: "scripts/201-base.sh"
       w.vm.provision :reload
 
       # Seletor do script de instalação da engine de contêiner
       case OCI
       when "Containerd"
-        w.vm.provision "shell", path: "scripts/10-oci-containerd.sh"
+        w.vm.provision "shell", path: "scripts/210-oci-containerd.sh"
       when "CRI-O"
-        w.vm.provision "shell", path: "scripts/10-oci-crio.sh"
+        w.vm.provision "shell", path: "scripts/210-oci-crio.sh"
       else #Docker
-        w.vm.provision "shell", path: "scripts/10-oci-docker.sh"
+        w.vm.provision "shell", path: "scripts/210-oci-docker.sh"
       end
 
       # Script de instalação das ferramentas básicas do Kubernetes
-      w.vm.provision "shell", path: "scripts/20-kubeadm-kubelet-kubectl.sh"
+      w.vm.provision "shell", path: "scripts/220-kubeadm-kubelet-kubectl.sh"
 
       # Script de instalação do worker node e conexão no cluster
-      w.vm.provision "shell", path: "scripts/50-worker-join.sh", privileged: false
+      w.vm.provision "shell", path: "scripts/250-worker-join.sh", privileged: false
     end
   end
 end
