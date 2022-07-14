@@ -39,7 +39,6 @@ spec:
     command: ["stress"]
     args: ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
 ---
----
 # https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/
 apiVersion: v1
 kind: Pod
