@@ -92,7 +92,7 @@ EOF
 
 kubectl apply -f dashboard-loadbalancer.yml
 
-kubectl config set-credentials kubernetes-admin --token="$(openssl rand -hex 64)"
+kubectl config set-credentials kubernetes-admin --token="$(kubectl -n kubernetes-dashboard create token admin-user)"
 kubectl config view --raw > /tmp/k8s/kubeconfig-dashboard.yaml
 
 sleep 10s
