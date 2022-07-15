@@ -7,6 +7,9 @@ echo "#######################################################"
 # Importação das variáveis comuns usadas por todo o projeto
 source /vagrant/scripts/00-envvars.sh
 
+# Atualização do timezone das máquinas
+timedatectl set-timezone America/Sao_Paulo
+
 apt-get install -yq haproxy
 
 cat <<EOF | tee -a /etc/haproxy/haproxy.cfg > /dev/null

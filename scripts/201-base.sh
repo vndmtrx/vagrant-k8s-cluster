@@ -7,6 +7,9 @@ echo "#################################################################"
 # Importação das variáveis comuns usadas por todo o projeto
 source /vagrant/scripts/00-envvars.sh
 
+# Atualização do timezone das máquinas
+timedatectl set-timezone America/Sao_Paulo
+
 # Instalação do jq e do yamllint para interagir com as saídas do kubectl
 apt-get update -yq
 apt-get install -yq jq yamllint
