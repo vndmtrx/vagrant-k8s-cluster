@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: 03-pvc-nginx
+  name: 03-pvc-pod
   namespace: exemplos
   labels:
     app: vagrant-k8s-cluster
