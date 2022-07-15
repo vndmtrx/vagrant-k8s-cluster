@@ -25,11 +25,11 @@ spec:
     volumeMounts:
     - name: html
       mountPath: /html
-    command: 
+    command:
       - /usr/local/bin/bash
       - "-c"
     args:
-    - | 
+    - |
       echo "Data de start: $(date)" > /html/index.html ;
 ---
 # https://kubernetes.io/docs/concepts/services-networking/service/
