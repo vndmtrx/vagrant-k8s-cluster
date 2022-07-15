@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pv-04-pod
+  namespace: exemplos
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pv-cronjob-pod-service
+spec:
+  volumes:
+    - name: html
+      persistentVolumeClaim:
+        claimName: nfs1-pvc-html
+  containers:
+    - name: nginx-container
+      image: nginx
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+  initContainers:
+    - name: bash-container
+      image: bash
+      volumeMounts:
+        - name: html
+          mountPath: /html
+      command:
+        - /usr/local/bin/bash
+        - "-c"
+      args:
+        - |
+          echo "CronJob nunca rodou (*/5 * * * *)." > /html/index.html ;
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pv-04-cronjob
+  namespace: exemplos
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pv-cronjob-pod-service
+spec:
+ schedule: "*/5 * * * *"
+ failedJobsHistoryLimit: 1
+ successfulJobsHistoryLimit: 3
+ jobTemplate:
+   spec:
+     template:
+       spec:
+         restartPolicy: OnFailure
+         volumes:
+           - name: pvc-html
+             persistentVolumeClaim:
+               claimName: nfs1-pvc-html
+         containers:
+           - name: bash-container
+             image: bash
+             volumeMounts:
+               - name: pvc-html
+                 mountPath: /html
+             command:
+               - /usr/local/bin/bash
+               - "-c"
+             args:
+               - |
+                 echo "Ultima atualizacao do CronJob (*/5 * * * *): $(date)" > /html/index.html ;
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: pv-04-service
+  namespace: exemplos
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pv-cronjob-pod-service
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    exemplo: pv-cronjob-pod-service
+  type: LoadBalancer

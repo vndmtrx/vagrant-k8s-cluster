@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: 03-pvc-nginx
+  namespace: exemplos
+  labels:
+    app: vagrant-k8s-cluster
+    exemplo: pvc-pod
+spec:
+  volumes:
+    - name: nginx-pv-storage
+      persistentVolumeClaim:
+        claimName: nfs1-pvc-teste
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "nginx-server"
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: nginx-pv-storage
