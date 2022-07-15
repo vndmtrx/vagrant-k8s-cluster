@@ -7,7 +7,7 @@ echo "#######################################################"
 # Importação das variáveis comuns usadas por todo o projeto
 source /vagrant/scripts/00-envvars.sh
 
-apt-get install -yq jq haproxy
+apt-get install -yq haproxy
 
 cat <<EOF | tee -a /etc/haproxy/haproxy.cfg > /dev/null
 frontend stats
