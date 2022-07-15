@@ -11,6 +11,9 @@ source /vagrant/scripts/00-envvars.sh
 apt-get update -yq
 apt-get install -yq jq yamllint
 
+# Instalação das ferramentas de montagem do NFS
+apt-get install -yq nfs-common
+
 # Insatalação do yq
 curl -fsSLo /usr/local/bin/yq $YQ_LINK
 chmod 0755 /usr/local/bin/yq
