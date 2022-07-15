@@ -38,7 +38,23 @@ Vagrant.configure("2") do |config|
 
     cn.vm.provision "shell", path: "scripts/101-haproxy.sh"
   end
-  
+
+  # NFS Server
+  config.vm.define "nfs" do |cn|
+    cn.vm.box = IMAGEM
+    cn.vm.hostname = "nfs.k8s.cluster"
+    cn.vm.network "private_network", :ip => "192.168.56.9", :adapter => 2
+    cn.vm.provision :hosts, :sync_hosts => true
+    cn.vm.provider "virtualbox" do |v|
+      v.memory = 512
+      v.cpus = 1
+      v.default_nic_type = "virtio"
+      v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
+    end
+
+    cn.vm.provision "shell", path: "scripts/102-nfs.sh"
+  end
+
   # Configurações de instalação específicas do control node
   config.vm.define "cn-1", primary: true do |cn|
     cn.vm.box = IMAGEM
