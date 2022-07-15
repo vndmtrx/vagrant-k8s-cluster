@@ -11,12 +11,13 @@ ufw disable
 
 apt-get install -yq nfs-kernel-server
 
-mkdir -p /mnt/nfs/nfs1
-chown nobody:nogroup /mnt/nfs/nfs1
-chmod 0777 /mnt/nfs/nfs1/
+mkdir -p /mnt/nfs/nfs{1,2}
+chown nobody:nogroup /mnt/nfs/nfs1{1,2}
+chmod 0777 /mnt/nfs/nfs{1,2}
 
 cat <<EOF | tee -a /etc/exports > /dev/null
-/mnt/nfs/nfs1 192.168.56.0/24(rw,sync,no_subtree_check) 172.17.0.0/16(rw,sync,no_subtree_check)
+/mnt/nfs/nfs1 192.168.56.0/24(rw,sync,no_subtree_check)
+/mnt/nfs/nfs2 192.168.56.0/24(rw,sync,no_subtree_check)
 EOF
 
 exportfs -ra
