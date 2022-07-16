@@ -15,7 +15,7 @@ ufw disable
 apt-get install -yq nfs-kernel-server
 
 mkdir -p /mnt/nfs/nfs{1,2}
-chown nobody:nogroup /mnt/nfs/nfs1{1,2}
+chown nobody:nogroup /mnt/nfs/nfs{1,2}
 chmod 0777 /mnt/nfs/nfs{1,2}
 
 cat <<EOF | tee -a /etc/exports > /dev/null
