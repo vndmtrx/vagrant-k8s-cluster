@@ -6,8 +6,8 @@
 ### vagrant plugin install vagrant-hosts
 
 IMAGEM = "ubuntu/jammy64"
-WORKERS = 2
-CONTROLLERS = 2
+WORKERS = 1
+CONTROLLERS = 1
 MEMORIA = 2048
 CPUS = 2
 OCI = "Containerd"
@@ -104,38 +104,40 @@ Vagrant.configure("2") do |config|
   end
 
   # Configurações específicas dos outros control nodes
-  (2..CONTROLLERS+1).each do |i|
-    config.vm.define "cn-#{i}" do |cn|
-      cn.vm.box = IMAGEM
-      cn.vm.hostname = "control-node-#{i}.k8s.cluster"
-      cn.vm.network "private_network", :ip => "192.168.56.#{i+10}", :adapter => 2
-      cn.vm.provision :hosts, :sync_hosts => true
-      cn.vm.network "forwarded_port", guest: 8001, host: 8001, auto_correct: true
-      cn.vm.provider "virtualbox" do |v|
-        v.memory = MEMORIA
-        v.cpus = CPUS
-        v.default_nic_type = "virtio"
-        v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
+  if CONTROLLERS > 1
+    (2..CONTROLLERS).each do |i|
+      config.vm.define "cn-#{i}" do |cn|
+        cn.vm.box = IMAGEM
+        cn.vm.hostname = "control-node-#{i}.k8s.cluster"
+        cn.vm.network "private_network", :ip => "192.168.56.#{i+10}", :adapter => 2
+        cn.vm.provision :hosts, :sync_hosts => true
+        cn.vm.network "forwarded_port", guest: 8001, host: 8001, auto_correct: true
+        cn.vm.provider "virtualbox" do |v|
+          v.memory = MEMORIA
+          v.cpus = CPUS
+          v.default_nic_type = "virtio"
+          v.customize ["modifyvm", :id, "--natnet1", "10.254.0.0/16"]
+        end
+
+        cn.vm.provision "shell", path: "scripts/201-base.sh"
+        cn.vm.provision :reload
+
+        # Seletor do script de instalação da engine de contêiner
+        case OCI
+        when "Containerd"
+          cn.vm.provision "shell", path: "scripts/210-oci-containerd.sh"
+        when "CRI-O"
+          cn.vm.provision "shell", path: "scripts/210-oci-crio.sh"
+        else #Docker
+          config.vm.provision "shell", path: "scripts/210-oci-docker.sh"
+        end
+
+        # Script de instalação das ferramentas básicas do Kubernetes
+        cn.vm.provision "shell", path: "scripts/220-kubeadm-kubelet-kubectl.sh"
+
+        # Criação dos scripts de join para control e worker nodes
+        cn.vm.provision "shell", path: "scripts/240-controller-join.sh", privileged: false
       end
-
-      cn.vm.provision "shell", path: "scripts/201-base.sh"
-      cn.vm.provision :reload
-
-      # Seletor do script de instalação da engine de contêiner
-      case OCI
-      when "Containerd"
-        cn.vm.provision "shell", path: "scripts/210-oci-containerd.sh"
-      when "CRI-O"
-        cn.vm.provision "shell", path: "scripts/210-oci-crio.sh"
-      else #Docker
-        config.vm.provision "shell", path: "scripts/210-oci-docker.sh"
-      end
-
-      # Script de instalação das ferramentas básicas do Kubernetes
-      cn.vm.provision "shell", path: "scripts/220-kubeadm-kubelet-kubectl.sh"
-
-      # Criação dos scripts de join para control e worker nodes
-      cn.vm.provision "shell", path: "scripts/240-controller-join.sh", privileged: false
     end
   end
 
