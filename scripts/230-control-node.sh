@@ -28,6 +28,14 @@ apiServer:
     certSANs:
         - "$HOST"
         - "$IP"
+    extraArgs:
+        authorization-mode: "Node,RBAC"
+controllerManager:
+    extraArgs:
+        bind-address: "0.0.0.0"
+scheduler:
+    extraArgs:
+        bind-address: "0.0.0.0"
 etcd:
     local:
         serverCertSANs:
