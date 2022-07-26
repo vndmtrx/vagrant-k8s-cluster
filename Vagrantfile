@@ -14,11 +14,13 @@ OCI = "Containerd"
 CNI = "Flannel"
 
 Vagrant.configure("2") do |config|
-  config.ssh.insert_key = false
+  config.vagrant.plugins = ["vagrant-reload", "vagrant-hosts"]
 
   if Vagrant.has_plugin?("vagrant-vbguest")
     config.vbguest.auto_update = false
   end
+
+  config.ssh.insert_key = false
 
   # Configuração da pasta de montagem dos arquivos gerados pelo control node
   config.vm.synced_folder "./data", "/tmp/k8s", create: true
