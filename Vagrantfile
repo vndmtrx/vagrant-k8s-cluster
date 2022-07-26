@@ -8,7 +8,7 @@
 IMAGEM = "ubuntu/jammy64"
 WORKERS = 1
 CONTROLLERS = 1
-MEMORIA = 2048
+MEMORIA = 4096
 CPUS = 2
 OCI = "Containerd"
 CNI = "Flannel"
