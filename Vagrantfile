@@ -101,6 +101,7 @@ Vagrant.configure("2") do |config|
     cn.vm.provision "shell", path: "scripts/233-metrics.sh", privileged: false
     cn.vm.provision "shell", path: "scripts/234-helm.sh", privileged: false
     cn.vm.provision "shell", path: "scripts/235-dashboard.sh", privileged: false
+    cn.vm.provision "shell", path: "scripts/236-registry.sh", privileged: false
   end
 
   # Configurações específicas dos outros control nodes
